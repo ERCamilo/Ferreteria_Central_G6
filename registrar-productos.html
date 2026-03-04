@@ -1,84 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registrar Productos | Ferretería Central</title>
-<link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Productos | Ferretería Central</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
 
-<div class="layout">
+    <div class="layout">
 
-<aside class="sidebar">
-    <div class="sidebar-brand">FERRETERÍA CENTRAL</div>
+        <aside class="sidebar">
+            <div class="sidebar-brand">FERRETERÍA CENTRAL</div>
 
-    <nav class="sidebar-nav">
-        <a href="dashboard.html">Inicio</a>
-        <a href="#">Inventario</a>
-        <a href="#">Ventas</a>
-        <a href="#">Clientes</a>
-        <a href="#" class="active">Registrar Productos</a>
-        <a href="index.html" class="logout">Cerrar Sesión</a>
-    </nav>
-</aside>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Inicio</a>
+                <a href="#">Inventario</a>
+                <a href="#">Ventas</a>
+                <a href="#">Clientes</a>
+                <a href="#" class="active">Registrar Productos</a>
+                <a href="index.html" class="logout">Cerrar Sesión</a>
+            </nav>
+        </aside>
 
-<main class="dashboard-main">
+        <main class="dashboard-main">
 
-<header class="dashboard-header">
-    <h1>Registro de Productos</h1>
-</header>
+            <header class="dashboard-header">
+                <h1>Registro de Productos</h1>
+            </header>
 
-<section class="form-section">
+            <section class="form-section">
 
-<form class="form-card">
+                <form class="form-card">
 
-    <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" required>
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <input type="text" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio</label>
+                        <input type="number" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto</label>
+                        <input type="file" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn-primary full-width">
+                        Registrar Producto
+                    </button>
+
+                </form>
+
+            </section>
+
+        </main>
     </div>
-
-    <div class="form-group">
-        <label>Marca</label>
-        <input type="text" required>
-    </div>
-
-    <div class="form-group">
-        <label>Categoría</label>
-        <input type="text" required>
-    </div>
-
-    <div class="form-group">
-        <label>Precio</label>
-        <input type="number" step="0.01" required>
-    </div>
-
-    <div class="form-group">
-        <label>Cantidad</label>
-        <input type="number" required>
-    </div>
-
-    <div class="form-group">
-        <label>Descripción</label>
-        <textarea rows="3"></textarea>
-    </div>
-
-    <div class="form-group">
-        <label>Foto</label>
-        <input type="file" accept="image/*">
-    </div>
-
-    <button type="submit" class="btn-primary full-width">
-        Registrar Producto
-    </button>
-
-</form>
-
-</section>
-
-</main>
-</div>
 
 </body>
+
 </html>

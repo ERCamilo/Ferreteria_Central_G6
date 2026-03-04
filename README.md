@@ -69,7 +69,7 @@ grupo6/
     └── ...                  ← Imágenes del proyecto
 ```
 
-
+---
 
 <p align="center">
   © 2026 Ferretería Central · Grupo 6

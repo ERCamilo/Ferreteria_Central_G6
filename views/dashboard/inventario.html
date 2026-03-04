@@ -1,0 +1,166 @@
+<!-- Vista: Inventario -->
+<!-- Este archivo es cargado dinámicamente por dashboard.js -->
+
+<section class="dash-section">
+    <div class="section-header">
+        <div></div>
+        <a href="#registrar-productos" class="btn-primary btn-sm">
+            <i data-lucide="plus"></i>
+            Nuevo Producto
+        </a>
+    </div>
+</section>
+
+<!-- FILTERS -->
+<section class="filters-bar">
+    <div class="filter-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Buscar producto..." id="searchInventario">
+    </div>
+    <select class="filter-select" id="filterCategoria">
+        <option value="">Todas las categorías</option>
+        <option value="herramientas">Herramientas</option>
+        <option value="materiales">Materiales</option>
+        <option value="equipos">Equipos</option>
+        <option value="electricidad">Electricidad</option>
+        <option value="plomeria">Plomería</option>
+        <option value="seguridad">Seguridad</option>
+    </select>
+    <select class="filter-select" id="filterStock">
+        <option value="">Todo el stock</option>
+        <option value="disponible">Disponible</option>
+        <option value="bajo">Stock bajo</option>
+        <option value="agotado">Agotado</option>
+    </select>
+</section>
+
+<!-- INVENTORY TABLE -->
+<section class="dash-panel">
+    <div class="table-wrapper">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Marca</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--tool">🔧</span>
+                        Taladro Industrial 750W
+                    </td>
+                    <td>Herramientas</td>
+                    <td>DeWalt</td>
+                    <td>$4,500</td>
+                    <td>127</td>
+                    <td><span class="badge badge--success">Disponible</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--material">🧱</span>
+                        Cemento Portland 50kg
+                    </td>
+                    <td>Materiales</td>
+                    <td>Cemex</td>
+                    <td>$350</td>
+                    <td>890</td>
+                    <td><span class="badge badge--success">Disponible</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--equip">⚡</span>
+                        Compresor de Aire 25L
+                    </td>
+                    <td>Equipos</td>
+                    <td>Truper</td>
+                    <td>$8,900</td>
+                    <td>8</td>
+                    <td><span class="badge badge--warning">Stock bajo</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--tool">🪛</span>
+                        Destornillador Phillips #2
+                    </td>
+                    <td>Herramientas</td>
+                    <td>Stanley</td>
+                    <td>$180</td>
+                    <td>1,540</td>
+                    <td><span class="badge badge--success">Disponible</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--material">💡</span>
+                        Cable Eléctrico 12AWG (100m)
+                    </td>
+                    <td>Electricidad</td>
+                    <td>Condumex</td>
+                    <td>$1,200</td>
+                    <td>0</td>
+                    <td><span class="badge badge--danger">Agotado</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="product-cell">
+                        <span class="product-icon product-icon--tool">🔨</span>
+                        Martillo de Bola 16oz
+                    </td>
+                    <td>Herramientas</td>
+                    <td>Truper</td>
+                    <td>$320</td>
+                    <td>245</td>
+                    <td><span class="badge badge--success">Disponible</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                        <button class="action-btn action-btn--danger" title="Eliminar"><i
+                                data-lucide="trash-2"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="table-pagination">
+        <span class="pagination-info">Mostrando 1-6 de 1,258 productos</span>
+        <div class="pagination-controls">
+            <button class="pagination-btn" disabled>&laquo;</button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span class="pagination-dots">...</span>
+            <button class="pagination-btn">210</button>
+            <button class="pagination-btn">&raquo;</button>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,150 @@
+<!-- Vista: Ventas -->
+<!-- Este archivo es cargado dinámicamente por dashboard.js -->
+
+<section class="dash-section">
+    <div class="section-header">
+        <div></div>
+        <div class="section-actions">
+            <button class="btn-outline btn-sm">
+                <i data-lucide="download"></i>
+                Exportar CSV
+            </button>
+            <button class="btn-outline btn-sm">
+                <i data-lucide="printer"></i>
+                Imprimir
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- SALES SUMMARY CARDS -->
+<section class="stat-cards stat-cards--compact">
+    <article class="stat-card stat-card--sales">
+        <div class="stat-card__header">
+            <span class="stat-card__label">VENTAS HOY</span>
+            <i data-lucide="calendar"></i>
+        </div>
+        <p class="stat-card__value">$12,450</p>
+        <span class="stat-card__change positive">+ 8% vs ayer</span>
+    </article>
+
+    <article class="stat-card stat-card--orders">
+        <div class="stat-card__header">
+            <span class="stat-card__label">ESTA SEMANA</span>
+            <i data-lucide="calendar-range"></i>
+        </div>
+        <p class="stat-card__value">$69,524</p>
+        <span class="stat-card__change positive">+ 5% vs semana anterior</span>
+    </article>
+
+    <article class="stat-card stat-card--customers">
+        <div class="stat-card__header">
+            <span class="stat-card__label">ESTE MES</span>
+            <i data-lucide="calendar-days"></i>
+        </div>
+        <p class="stat-card__value">$245,800</p>
+        <span class="stat-card__change positive">+ 12% vs mes anterior</span>
+    </article>
+</section>
+
+<!-- CHART PLACEHOLDER -->
+<section class="dash-panel">
+    <div class="panel-header">
+        <h3>Tendencia de Ventas</h3>
+        <div class="panel-filters">
+            <button class="panel-btn">7 Días</button>
+            <button class="panel-btn active">30 Días</button>
+            <button class="panel-btn">90 Días</button>
+        </div>
+    </div>
+    <div class="chart-placeholder chart-placeholder--lines" style="height: 280px;">
+        <div class="chart-placeholder-content">
+            <i data-lucide="bar-chart-2"></i>
+            <p>Gráfico de tendencia de ventas</p>
+            <small>Se implementará con Chart.js</small>
+        </div>
+    </div>
+</section>
+
+<!-- FILTERS -->
+<section class="filters-bar">
+    <div class="filter-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Buscar venta..." id="searchVentas">
+    </div>
+    <input type="date" class="filter-date" id="filterFechaDesde">
+    <input type="date" class="filter-date" id="filterFechaHasta">
+</section>
+
+<!-- SALES TABLE -->
+<section class="dash-panel">
+    <div class="table-wrapper">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th># Venta</th>
+                    <th>Cliente</th>
+                    <th>Productos</th>
+                    <th>Fecha</th>
+                    <th>Método Pago</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>#VNT-4521</strong></td>
+                    <td>Carlos Méndez</td>
+                    <td>3 artículos</td>
+                    <td>03 Mar 2026</td>
+                    <td><span class="badge badge--info">Tarjeta</span></td>
+                    <td><strong>$12,350</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>#VNT-4520</strong></td>
+                    <td>Ana Martínez</td>
+                    <td>1 artículo</td>
+                    <td>03 Mar 2026</td>
+                    <td><span class="badge badge--success">Efectivo</span></td>
+                    <td><strong>$4,500</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>#VNT-4519</strong></td>
+                    <td>José Ramírez</td>
+                    <td>5 artículos</td>
+                    <td>02 Mar 2026</td>
+                    <td><span class="badge badge--info">Tarjeta</span></td>
+                    <td><strong>$890</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>#VNT-4518</strong></td>
+                    <td>María Santos</td>
+                    <td>2 artículos</td>
+                    <td>02 Mar 2026</td>
+                    <td><span class="badge badge--warning">Transferencia</span></td>
+                    <td><strong>$15,200</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>#VNT-4517</strong></td>
+                    <td>Pedro López</td>
+                    <td>1 artículo</td>
+                    <td>01 Mar 2026</td>
+                    <td><span class="badge badge--success">Efectivo</span></td>
+                    <td><strong>$2,100</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-pagination">
+        <span class="pagination-info">Mostrando 1-5 de 4,521 ventas</span>
+        <div class="pagination-controls">
+            <button class="pagination-btn" disabled>&laquo;</button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span class="pagination-dots">...</span>
+            <button class="pagination-btn">905</button>
+            <button class="pagination-btn">&raquo;</button>
+        </div>
+    </div>
+</section>
