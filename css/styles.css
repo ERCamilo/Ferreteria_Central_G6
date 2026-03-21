@@ -971,3 +971,13 @@ body {
   text-decoration: none;
   font-size: 14px;
 }
+
+.cart-item{
+
+padding:20px;
+margin-bottom:20px;
+border:1px solid #ddd;
+border-radius:8px;
+background:white;
+
+}
