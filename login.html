@@ -1,37 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acceso Administrativo | Ferretería Central</title>
-<link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | Ferretería Central</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Tabs for Login */
+        .auth-tabs { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 24px; }
+        .auth-tab { flex: 1; padding: 12px; text-align: center; font-weight: 600; color: #6b7280; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .auth-tab:hover { color: #0b1838; }
+        .auth-tab.active { color: #F68121; border-bottom-color: #F68121; }
+        .admin-note { background: #fefce8; border: 1px solid #fef08a; padding: 10px; border-radius: 6px; font-size: 13px; color: #854d0e; margin-bottom: 16px; display: none; }
+    </style>
 </head>
 
-<body class="login-body">
+<body class="auth-body">
 
-<main class="login-wrapper">
+    <main class="auth-wrapper">
 
-<form class="login-card" action="dashboard.html">
+        <div class="auth-card">
 
-<div class="login-logologin">
-<img src="assets/logologin.jpeg" alt="Ferretería Central">
-</div>
+            <!-- Logo -->
+            <a href="index.html" class="auth-logo">
+                <img src="assets/logo.png" alt="Ferretería Central">
+                <h1>Ferretería Central</h1>
+            </a>
 
-<h2 class="login-title">Acceso Administrativo</h2>
+            <h2 class="auth-title">Iniciar Sesión</h2>
+            <p class="auth-subtitle">Selecciona tu tipo de cuenta</p>
 
-<label>Usuario</label>
-<input type="text" required>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('cliente')" id="tabCliente">Soy Cliente</div>
+                <div class="auth-tab" onclick="switchTab('admin')" id="tabAdmin">Administrador</div>
+            </div>
 
-<label>Contraseña</label>
-<input type="password" required>
+            <!-- Mensaje de error/éxito -->
+            <div class="auth-message" id="authMessage" style="display:none;"></div>
+            
+            <div class="admin-note" id="adminNote">
+                <i data-lucide="info" style="width:16px;height:16px;vertical-align:text-bottom;"></i>
+                Credenciales de prueba precargadas para facilitar la demostración.
+            </div>
 
-<button type="submit" class="btn-primary full-width">
-Entrar al Sistema
-</button>
+            <form class="auth-form" id="loginForm">
 
-</form>
+                <div class="form-group">
+                    <label for="loginEmail">
+                        <i data-lucide="mail"></i> Correo electrónico
+                    </label>
+                    <input type="email" id="loginEmail" placeholder="tu@correo.com" required>
+                </div>
 
-</main>
+                <div class="form-group">
+                    <label for="loginPassword">
+                        <i data-lucide="lock"></i> Contraseña
+                    </label>
+                    <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
+                </div>
+
+                <button type="submit" class="btn-primary full-width" id="loginBtn">
+                    <i data-lucide="log-in"></i>
+                    Ingresar
+                </button>
+
+            </form>
+
+            <div class="auth-footer" id="registroFooter">
+                <p>¿No tienes cuenta? <a href="views/registro.html">Crear cuenta</a></p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/datos/db.js"></script>
+    <script src="js/datos/productos.js"></script>
+    <script src="js/datos/auth.js"></script>
+    <script src="js/datos/carrito.js"></script>
+    <script src="js/datos/pedidos.js"></script>
+    <script src="js/store.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const form = document.getElementById('loginForm');
+        const msgDiv = document.getElementById('authMessage');
+        const emailInput = document.getElementById('loginEmail');
+        const passInput = document.getElementById('loginPassword');
+        let currentRole = 'cliente';
+
+        function switchTab(role) {
+            currentRole = role;
+            document.getElementById('tabCliente').classList.toggle('active', role === 'cliente');
+            document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+            document.getElementById('adminNote').style.display = role === 'admin' ? 'block' : 'none';
+            document.getElementById('registroFooter').style.display = role === 'admin' ? 'none' : 'block';
+
+            if (role === 'admin') {
+                emailInput.value = 'admin@ferreteriacentral.com';
+                passInput.value = 'admin123';
+            } else {
+                emailInput.value = '';
+                passInput.value = '';
+            }
+            // hide previous messages
+            msgDiv.style.display = 'none';
+        }
+
+        function showMessage(text, type) {
+            msgDiv.textContent = text;
+            msgDiv.className = 'auth-message auth-message--' + type;
+            msgDiv.style.display = 'block';
+        }
+
+        // Si viene de registro exitoso, mostrar mensaje
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('registered') === '1') {
+            showMessage('¡Cuenta creada exitosamente! Ya puedes iniciar sesión.', 'success');
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passInput.value;
+
+            const result = Store.login(email, password);
+
+            if (result.success) {
+                // Verificar que el rol coincide con la pestaña seleccionada para mejor UX
+                if (result.user.rol !== currentRole) {
+                    showMessage('Credenciales válidas, pero el tipo de cuenta no coincide con la pestaña seleccionada.', 'error');
+                    return;
+                }
+
+                // Redirigir según rol
+                if (result.user.rol === 'admin') {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } else {
+                showMessage(result.error, 'error');
+            }
+        });
+    </script>
 
 </body>
 </html>

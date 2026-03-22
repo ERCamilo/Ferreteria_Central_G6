@@ -480,14 +480,12 @@
 /* ========================
    CHART PLACEHOLDERS
    ======================== */
-.chart-placeholder--lines {
-    height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(180deg, rgba(246, 129, 33, 0.03) 0%, rgba(11, 24, 56, 0.03) 100%);
+/* --- Chart Containers --- */
+.chart-container {
+    background: var(--white);
+    padding: 10px;
     border-radius: var(--radius-sm);
-    border: 1px dashed var(--border);
+    min-height: 200px;
 }
 
 .chart-placeholder-content {

@@ -20,7 +20,7 @@
             <i data-lucide="users"></i>
         </div>
         <div>
-            <p class="mini-stat__value">842</p>
+            <p class="mini-stat__value" id="clientesTotal">0</p>
             <span class="mini-stat__label">Total Clientes</span>
         </div>
     </div>
@@ -29,7 +29,7 @@
             <i data-lucide="user-plus"></i>
         </div>
         <div>
-            <p class="mini-stat__value">28</p>
+            <p class="mini-stat__value" id="clientesNuevos">0</p>
             <span class="mini-stat__label">Nuevos este mes</span>
         </div>
     </div>
@@ -38,7 +38,7 @@
             <i data-lucide="repeat"></i>
         </div>
         <div>
-            <p class="mini-stat__value">67%</p>
+            <p class="mini-stat__value" id="clientesRecurrentes">0%</p>
             <span class="mini-stat__label">Recurrentes</span>
         </div>
     </div>
@@ -72,67 +72,8 @@
                     <th>Estado</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td class="product-cell">
-                        <div class="client-avatar">CM</div>
-                        Carlos Méndez
-                    </td>
-                    <td>carlos.mendez@email.com</td>
-                    <td>809-555-0101</td>
-                    <td>24</td>
-                    <td>$68,500</td>
-                    <td>15 Ene 2026</td>
-                    <td><span class="badge badge--success">Activo</span></td>
-                </tr>
-                <tr>
-                    <td class="product-cell">
-                        <div class="client-avatar">AM</div>
-                        Ana Martínez
-                    </td>
-                    <td>ana.martinez@email.com</td>
-                    <td>809-555-0202</td>
-                    <td>12</td>
-                    <td>$34,200</td>
-                    <td>22 Ene 2026</td>
-                    <td><span class="badge badge--success">Activo</span></td>
-                </tr>
-                <tr>
-                    <td class="product-cell">
-                        <div class="client-avatar">JR</div>
-                        José Ramírez
-                    </td>
-                    <td>jose.ramirez@email.com</td>
-                    <td>809-555-0303</td>
-                    <td>8</td>
-                    <td>$12,800</td>
-                    <td>03 Feb 2026</td>
-                    <td><span class="badge badge--success">Activo</span></td>
-                </tr>
-                <tr>
-                    <td class="product-cell">
-                        <div class="client-avatar">MS</div>
-                        María Santos
-                    </td>
-                    <td>maria.santos@email.com</td>
-                    <td>809-555-0404</td>
-                    <td>31</td>
-                    <td>$95,400</td>
-                    <td>10 Dic 2025</td>
-                    <td><span class="badge badge--success">Activo</span></td>
-                </tr>
-                <tr>
-                    <td class="product-cell">
-                        <div class="client-avatar">PL</div>
-                        Pedro López
-                    </td>
-                    <td>pedro.lopez@email.com</td>
-                    <td>809-555-0505</td>
-                    <td>2</td>
-                    <td>$3,100</td>
-                    <td>28 Feb 2026</td>
-                    <td><span class="badge badge--warning">Inactivo</span></td>
-                </tr>
+            <tbody id="adminClientesTableBody">
+                <!-- Se inyecta con dashboard.js -->
             </tbody>
         </table>
     </div>

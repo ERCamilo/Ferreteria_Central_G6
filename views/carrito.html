@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito | Ferretería Central</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/carrito.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <div id="app-header" data-base-path="../"></div>
+    <main class="cart-page">
+
+        <h1><i data-lucide="shopping-cart"></i> Mi Carrito</h1>
+
+        <!-- Contenido dinámico -->
+        <div id="cartContent"></div>
+
+    </main>
+
+    <script src="../js/datos/db.js"></script>
+    <script src="../js/datos/productos.js"></script>
+    <script src="../js/datos/auth.js"></script>
+    <script src="../js/datos/carrito.js"></script>
+    <script src="../js/datos/pedidos.js"></script>
+    <script src="../js/store.js"></script>
+    <script src="../js/components/header.js"></script>
+    <script>
+        // Actualizar render
+        function renderCart() {
+            const container = document.getElementById('cartContent');
+            const cart = Store.getCart();
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="cart-empty">
+                        <i data-lucide="shopping-cart"></i>
+                        <h2>Tu carrito está vacío</h2>
+                        <p>Agrega productos desde nuestro catálogo para continuar.</p>
+                        <a href="../index.html">Ir a la tienda</a>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            let rows = '';
+            let subtotal = 0;
+
+            cart.forEach(function(item) {
+                const product = Store.getProductById(item.productId);
+                if (!product) return;
+
+                const itemTotal = product.precio * item.cantidad;
+                subtotal += itemTotal;
+
+                // Imagen: ajustar ruta relativa
+                const imgSrc = product.imagen.startsWith('data:') ? product.imagen : '../' + product.imagen;
+
+                rows += `
+                    <tr>
+                        <td>
+                            <div class="cart-product">
+                                <img src="${imgSrc}" alt="${product.nombre}">
+                                <div class="cart-product-info">
+                                    <h3>${product.nombre}</h3>
+                                    <small>${product.categoria}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="cart-price">$${product.precio.toFixed(2)}</span></td>
+                        <td>
+                            <div class="qty-controls">
+                                <button onclick="changeQty('${item.productId}', -1)">−</button>
+                                <span>${item.cantidad}</span>
+                                <button onclick="changeQty('${item.productId}', 1)">+</button>
+                            </div>
+                        </td>
+                        <td><span class="cart-subtotal">$${itemTotal.toFixed(2)}</span></td>
+                        <td>
+                            <button class="cart-remove" onclick="removeItem('${item.productId}')" title="Eliminar">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const envio = subtotal >= 100 ? 0 : 8.99;
+            const total = subtotal + envio;
+
+            container.innerHTML = `
+                <div class="cart-layout">
+                    <div class="cart-items-container">
+                        <table class="cart-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+
+                    <div class="cart-summary">
+                        <div class="cart-summary-card">
+                            <h3>Resumen del Pedido</h3>
+                            <div class="summary-row">
+                                <span>Subtotal (${Store.getCartCount()} artículos)</span>
+                                <span>$${subtotal.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Envío</span>
+                                <span class="${envio === 0 ? 'free' : ''}">${envio === 0 ? 'GRATIS' : '$' + envio.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span>$${total.toFixed(2)}</span>
+                            </div>
+                            <a href="checkout.html" class="btn-checkout">
+                                <i data-lucide="shield-check"></i>
+                                Proceder al Pago
+                            </a>
+                            <a href="../index.html" class="btn-continue">
+                                <i data-lucide="arrow-left"></i> Seguir Comprando
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            const headerCartCount = document.getElementById('cartCountHeader');
+            if (headerCartCount) headerCartCount.textContent = Store.getCartCount();
+        }
+
+        function changeQty(productId, delta) {
+            const cart = Store.getCart();
+            const item = cart.find(function(i) { return i.productId === productId; });
+            if (item) {
+                const newQty = item.cantidad + delta;
+                if (newQty < 1) {
+                    removeItem(productId);
+                    return;
+                }
+                Store.updateCartQty(productId, newQty);
+            }
+            renderCart();
+        }
+
+        function removeItem(productId) {
+            Store.removeFromCart(productId);
+            renderCart();
+        }
+
+        // Render initial
+        renderCart();
+    </script>
+
+</body>
+</html>

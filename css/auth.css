@@ -1,0 +1,204 @@
+/* ================================
+   AUTH STYLES (Login / Registro)
+   Ferretería Central
+   ================================ */
+
+.auth-body {
+    background: linear-gradient(135deg, #0b1838 0%, #1a2a5e 50%, #0b1838 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px 36px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: fadeUp 0.4s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Logo */
+.auth-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    margin-bottom: 24px;
+}
+
+.auth-logo img {
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.auth-logo h1 {
+    font-size: 20px;
+    color: #0b1838;
+    font-weight: 800;
+}
+
+/* Title */
+.auth-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #0b1838;
+    margin-bottom: 4px;
+}
+
+.auth-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #565959;
+    margin-bottom: 24px;
+}
+
+/* Messages */
+.auth-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.auth-message--error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.auth-message--success {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+/* Form */
+.auth-form .form-group {
+    margin-bottom: 18px;
+}
+
+.auth-form label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.auth-form label i,
+.auth-form label svg {
+    width: 14px;
+    height: 14px;
+    color: #F68121;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0f1111;
+    transition: border-color 0.2s ease;
+    background: #fafafa;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #F68121;
+    background: #fff;
+}
+
+.auth-form input::placeholder {
+    color: #9ca3af;
+}
+
+/* Submit Button */
+.auth-form .btn-primary {
+    background: #F68121;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.auth-form .btn-primary:hover {
+    background: #e5741d;
+    box-shadow: 0 4px 16px rgba(246, 129, 33, 0.4);
+    transform: translateY(-1px);
+}
+
+.auth-form .btn-primary i,
+.auth-form .btn-primary svg {
+    width: 18px;
+    height: 18px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* Footer link */
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.auth-footer p {
+    font-size: 13px;
+    color: #565959;
+}
+
+.auth-footer a {
+    color: #F68121;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.auth-footer a:hover {
+    color: #0b1838;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 28px 20px;
+    }
+}

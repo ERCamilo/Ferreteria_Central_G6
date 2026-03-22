@@ -8,8 +8,8 @@
             <span class="stat-card__label">VENTAS NETAS</span>
             <i data-lucide="trending-up"></i>
         </div>
-        <p class="stat-card__value">$27,450</p>
-        <span class="stat-card__change positive">+ 5% vs semana pasada</span>
+        <p class="stat-card__value" id="inicioTotalVentas">$0.00</p>
+        <span class="stat-card__change positive" id="inicioCambioVentas">Calculando...</span>
     </article>
 
     <article class="stat-card stat-card--orders">
@@ -17,8 +17,8 @@
             <span class="stat-card__label">PEDIDOS</span>
             <i data-lucide="shopping-bag"></i>
         </div>
-        <p class="stat-card__value">1,284</p>
-        <span class="stat-card__change positive">+ 3.2% vs mes pasado</span>
+        <p class="stat-card__value" id="inicioTotalPedidos">0</p>
+        <span class="stat-card__change positive" id="inicioCambioPedidos">Calculando...</span>
     </article>
 
     <article class="stat-card stat-card--customers">
@@ -26,17 +26,17 @@
             <span class="stat-card__label">CLIENTES</span>
             <i data-lucide="users"></i>
         </div>
-        <p class="stat-card__value">842</p>
-        <span class="stat-card__change positive">+ 12% vs mes pasado</span>
+        <p class="stat-card__value" id="inicioTotalClientes">0</p>
+        <span class="stat-card__change positive" id="inicioCambioClientes">Calculando...</span>
     </article>
 
     <article class="stat-card stat-card--growth">
         <div class="stat-card__header">
-            <span class="stat-card__label">CRECIMIENTO</span>
-            <i data-lucide="bar-chart-3"></i>
+            <span class="stat-card__label">ACTIVOS HOY</span>
+            <i data-lucide="activity"></i>
         </div>
-        <p class="stat-card__value">18.2%</p>
-        <span class="stat-card__change negative">- 2.1% vs semana pasada</span>
+        <p class="stat-card__value" id="inicioActiveUsers">1</p>
+        <span class="stat-card__change positive">Usuarios conectados hoy</span>
     </article>
 </section>
 
@@ -49,50 +49,29 @@
             <div class="panel-legend">
                 <span class="legend-item">
                     <span class="legend-dot legend-dot--current"></span>
-                    $69,524 <small>(Esta semana)</small>
+                    <span id="inicioVentasSemanaActual">$0.00</span> <small>(Esta semana)</small>
                 </span>
                 <span class="legend-item">
                     <span class="legend-dot legend-dot--previous"></span>
-                    $58,254 <small>(Semana anterior)</small>
+                    <span id="inicioVentasSemanaAnterior">$0.00</span> <small>(Semana anterior)</small>
                 </span>
             </div>
             <button class="panel-btn">Esta Semana</button>
         </div>
-        <div class="chart-placeholder chart-placeholder--lines">
-            <div class="chart-placeholder-content">
-                <i data-lucide="line-chart"></i>
-                <p>Gráfico de ventas</p>
-                <small>Se implementará con Chart.js</small>
-            </div>
+        <div class="chart-container" style="position: relative; height:250px; width:100%">
+            <canvas id="ventasSemanaChart"></canvas>
         </div>
     </article>
 
-    <!-- Categories Donut -->
     <article class="dash-panel dash-panel--small">
         <div class="panel-header">
-            <h3>Categorías</h3>
-            <button class="panel-btn">Esta Semana</button>
+            <h3>Categorías (Stock)</h3>
         </div>
-        <div class="chart-placeholder chart-placeholder--donut">
-            <div class="donut-ring">
-                <div class="donut-center">
-                    <span class="donut-percent">42%</span>
-                </div>
-            </div>
+        <div class="chart-container" style="position: relative; height:200px; width:100%; margin: 1rem 0;">
+            <canvas id="categoriasDonutChart"></canvas>
         </div>
-        <div class="category-stats">
-            <div class="cat-stat">
-                <p class="cat-stat__value">5,230</p>
-                <span class="cat-stat__label">Herramientas</span>
-            </div>
-            <div class="cat-stat">
-                <p class="cat-stat__value">3,120</p>
-                <span class="cat-stat__label">Materiales</span>
-            </div>
-            <div class="cat-stat">
-                <p class="cat-stat__value">1,890</p>
-                <span class="cat-stat__label">Equipos</span>
-            </div>
+        <div class="category-stats" id="inicioCategoryStats">
+            <!-- Renderizado desde js -->
         </div>
     </article>
 </section>
@@ -116,47 +95,8 @@
                         <th>Código</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td class="product-cell">
-                            <span class="product-icon product-icon--tool">🔧</span>
-                            Taladro Industrial
-                        </td>
-                        <td>03 Mar</td>
-                        <td>$4,500</td>
-                        <td>127</td>
-                        <td>SKU-001234</td>
-                    </tr>
-                    <tr>
-                        <td class="product-cell">
-                            <span class="product-icon product-icon--material">🧱</span>
-                            Cemento Portland 50kg
-                        </td>
-                        <td>02 Mar</td>
-                        <td>$350</td>
-                        <td>890</td>
-                        <td>SKU-005678</td>
-                    </tr>
-                    <tr>
-                        <td class="product-cell">
-                            <span class="product-icon product-icon--equip">⚡</span>
-                            Compresor de Aire
-                        </td>
-                        <td>01 Mar</td>
-                        <td>$8,900</td>
-                        <td>45</td>
-                        <td>SKU-009012</td>
-                    </tr>
-                    <tr>
-                        <td class="product-cell">
-                            <span class="product-icon product-icon--tool">🪛</span>
-                            Destornillador Phillips
-                        </td>
-                        <td>28 Feb</td>
-                        <td>$180</td>
-                        <td>1,540</td>
-                        <td>SKU-003456</td>
-                    </tr>
+                <tbody id="inicioTopProductsBody">
+                    <!-- Dinámico -->
                 </tbody>
             </table>
         </div>

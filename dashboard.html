@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/dashboard.css">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -50,7 +52,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <a href="index.html" class="sidebar-logout">
+                <a href="#" class="sidebar-logout" onclick="logoutAdmin(event)">
                     <i data-lucide="log-out"></i>
                     <span>Cerrar Sesión</span>
                 </a>
@@ -81,11 +83,11 @@
                     </button>
                     <button class="topbar-btn notification-btn" title="Notificaciones">
                         <i data-lucide="bell"></i>
-                        <span class="notification-badge">3</span>
+                        <span class="notification-badge" id="notificationBadge">0</span>
                     </button>
                     <div class="topbar-user">
-                        <div class="user-avatar">A</div>
-                        <span class="user-name">Admin</span>
+                        <div class="user-avatar" id="topbarUserAvatar">A</div>
+                        <span class="user-name" id="topbarUserName">Admin</span>
                     </div>
                 </div>
             </header>
@@ -102,7 +104,22 @@
         </main>
     </div>
 
+    <script src="js/datos/db.js"></script>
+    <script src="js/datos/productos.js"></script>
+    <script src="js/datos/auth.js"></script>
+    <script src="js/datos/carrito.js"></script>
+    <script src="js/datos/pedidos.js"></script>
+    <script src="js/store.js"></script>
     <script src="js/dashboard.js"></script>
+    <script>
+        function logoutAdmin(e) {
+            e.preventDefault();
+            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+                Store.logout();
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
 </body>
 
 </html>

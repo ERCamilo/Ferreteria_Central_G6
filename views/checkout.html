@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Ferretería Central</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .checkout-page { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; }
+        .checkout-page h1 { font-size: 24px; color: #0b1838; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+        .checkout-page h1 svg { color: #F68121; }
+
+        .checkout-grid { display: grid; grid-template-columns: 1fr 380px; gap: 28px; align-items: start; }
+
+        /* Sections */
+        .checkout-section { background: #fff; border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .checkout-section h2 { font-size: 16px; color: #0b1838; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #f3f4f6; }
+        .checkout-section h2 svg { width: 18px; height: 18px; color: #F68121; }
+
+        /* Form */
+        .checkout-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        .checkout-form .form-row.full { grid-template-columns: 1fr; }
+        .checkout-form label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        .checkout-form input, .checkout-form select { width: 100%; padding: 11px 14px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; color: #0f1111; transition: border-color 0.2s; background: #fafafa; }
+        .checkout-form input:focus, .checkout-form select:focus { outline: none; border-color: #F68121; background: #fff; }
+
+        /* Delivery options */
+        .delivery-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .delivery-option { border: 2px solid #e5e7eb; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .delivery-option:hover { border-color: #F68121; }
+        .delivery-option.selected { border-color: #F68121; background: #fff8f0; }
+        .delivery-option input { display: none; }
+        .delivery-option svg { width: 28px; height: 28px; margin-bottom: 6px; color: #6b7280; }
+        .delivery-option.selected svg { color: #F68121; }
+        .delivery-option strong { display: block; font-size: 14px; color: #0f1111; margin-bottom: 2px; }
+        .delivery-option small { font-size: 12px; color: #6b7280; }
+
+        /* Order summary sidebar */
+        .order-summary { background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px; position: sticky; top: 20px; }
+        .order-summary h3 { font-size: 16px; color: #0b1838; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb; }
+
+        .order-items { max-height: 280px; overflow-y: auto; margin-bottom: 16px; }
+        .order-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; }
+        .order-item:last-child { border-bottom: none; }
+        .order-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .order-item-info { flex: 1; }
+        .order-item-info h4 { font-size: 13px; color: #0f1111; margin-bottom: 2px; }
+        .order-item-info small { color: #6b7280; font-size: 12px; }
+        .order-item-price { font-weight: 700; font-size: 14px; color: #0b1838; white-space: nowrap; }
+
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #374151; }
+        .summary-line.total { font-size: 18px; font-weight: 800; color: #0b1838; margin-top: 12px; padding-top: 12px; border-top: 2px solid #e5e7eb; }
+        .summary-line .free { color: #16a34a; font-weight: 600; }
+
+        .btn-confirm { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: all 0.2s; }
+        .btn-confirm:hover { background: #15803d; box-shadow: 0 4px 16px rgba(22,163,74,0.3); transform: translateY(-1px); }
+        .btn-confirm:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-confirm svg { width: 18px; height: 18px; }
+        .btn-back { display: block; text-align: center; margin-top: 12px; color: #F68121; font-weight: 600; font-size: 13px; text-decoration: none; }
+        .btn-back:hover { text-decoration: underline; }
+
+        /* Success modal */
+        .success-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 0.3s; }
+        .success-card { background: #fff; border-radius: 16px; padding: 40px; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: scaleIn 0.3s ease; }
+        .success-card .success-icon { width: 72px; height: 72px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .success-card .success-icon svg { width: 36px; height: 36px; color: #16a34a; }
+        .success-card h2 { color: #0b1838; margin-bottom: 8px; }
+        .success-card p { color: #6b7280; margin-bottom: 6px; font-size: 14px; }
+        .success-card .order-id { font-size: 18px; font-weight: 800; color: #F68121; margin: 12px 0 20px; }
+        .success-card a { display: inline-block; background: #F68121; color: #fff; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; margin: 6px; transition: background 0.2s; }
+        .success-card a:hover { background: #e5741d; }
+        .success-card a.secondary { background: #e5e7eb; color: #374151; }
+        .success-card a.secondary:hover { background: #d1d5db; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        @media (max-width: 768px) {
+            .checkout-grid { grid-template-columns: 1fr; }
+            .checkout-form .form-row { grid-template-columns: 1fr; }
+            .order-summary { position: static; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header simplificado -->
+    <header class="store-header">
+        <div class="header-inner">
+            <a href="../index.html" class="header-logo">
+                <img src="../assets/logo.png" alt="Ferretería Central">
+                <div><span>Ferretería</span><span>Central</span></div>
+            </a>
+        </div>
+    </header>
+
+    <main class="checkout-page">
+
+        <h1><i data-lucide="credit-card"></i> Finalizar Compra</h1>
+
+        <div class="checkout-grid">
+
+            <!-- Left: Form -->
+            <div>
+
+                <!-- Delivery type -->
+                <div class="checkout-section">
+                    <h2><i data-lucide="truck"></i> Tipo de Entrega</h2>
+                    <div class="delivery-options">
+                        <label class="delivery-option selected" id="optEnvio" onclick="selectDelivery('envio')">
+                            <input type="radio" name="delivery" value="envio" checked>
+                            <i data-lucide="truck"></i>
+                            <strong>Envío a Domicilio</strong>
+                            <small>3-5 días hábiles</small>
+                        </label>
+                        <label class="delivery-option" id="optRecogida" onclick="selectDelivery('recogida')">
+                            <input type="radio" name="delivery" value="recogida">
+                            <i data-lucide="store"></i>
+                            <strong>Recoger en Tienda</strong>
+                            <small>Disponible en 24h</small>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Shipping address -->
+                <div class="checkout-section" id="addressSection">
+                    <h2><i data-lucide="map-pin"></i> Dirección de Envío</h2>
+                    <div class="checkout-form">
+                        <div class="form-row">
+                            <div>
+                                <label for="checkNombre">Nombre completo</label>
+                                <input type="text" id="checkNombre" required>
+                            </div>
+                            <div>
+                                <label for="checkTelefono">Teléfono</label>
+                                <input type="tel" id="checkTelefono">
+                            </div>
+                        </div>
+                        <div class="form-row full">
+                            <div>
+                                <label for="checkDireccion">Dirección</label>
+                                <input type="text" id="checkDireccion" placeholder="Calle, número, sector">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div>
+                                <label for="checkCiudad">Ciudad</label>
+                                <input type="text" id="checkCiudad" value="Santo Domingo">
+                            </div>
+                            <div>
+                                <label for="checkProvincia">Provincia</label>
+                                <select id="checkProvincia">
+                                    <option>Distrito Nacional</option>
+                                    <option>Santo Domingo</option>
+                                    <option>Santiago</option>
+                                    <option>La Vega</option>
+                                    <option>San Cristóbal</option>
+                                    <option>Otra</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment method (simulated) -->
+                <div class="checkout-section">
+                    <h2><i data-lucide="credit-card"></i> Método de Pago (Simulado)</h2>
+                    <div class="checkout-form">
+                        <div class="form-row full">
+                            <div>
+                                <label for="checkPago">Tipo</label>
+                                <select id="checkPago">
+                                    <option>Tarjeta de Crédito (simulado)</option>
+                                    <option>Tarjeta de Débito (simulado)</option>
+                                    <option>Pago contra entrega (simulado)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right: Summary -->
+            <div>
+                <div class="order-summary">
+                    <h3>Resumen del Pedido</h3>
+                    <div class="order-items" id="orderItems"></div>
+                    <div id="orderTotals"></div>
+                    <button class="btn-confirm" id="btnConfirm" onclick="confirmOrder()">
+                        <i data-lucide="check-circle"></i>
+                        Confirmar Compra
+                    </button>
+                    <a href="carrito.html" class="btn-back">← Volver al carrito</a>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="../js/datos/db.js"></script>
+    <script src="../js/datos/productos.js"></script>
+    <script src="../js/datos/auth.js"></script>
+    <script src="../js/datos/carrito.js"></script>
+    <script src="../js/datos/pedidos.js"></script>
+    <script src="../js/store.js"></script>
+    <script>
+        lucide.createIcons();
+
+        let deliveryType = 'envio';
+
+        // Pre-fill form from session
+        (function() {
+            const session = Store.getSession();
+            if (session) {
+                document.getElementById('checkNombre').value = session.nombre || '';
+                document.getElementById('checkTelefono').value = session.telefono || '';
+                document.getElementById('checkDireccion').value = session.direccion || '';
+            }
+        })();
+
+        // Check cart is not empty
+        if (Store.getCart().length === 0) {
+            window.location.href = 'carrito.html';
+        }
+
+        function selectDelivery(type) {
+            deliveryType = type;
+            document.getElementById('optEnvio').classList.toggle('selected', type === 'envio');
+            document.getElementById('optRecogida').classList.toggle('selected', type === 'recogida');
+            document.getElementById('addressSection').style.display = type === 'envio' ? 'block' : 'none';
+            renderSummary();
+        }
+
+        function renderSummary() {
+            const cart = Store.getCart();
+            const itemsDiv = document.getElementById('orderItems');
+            const totalsDiv = document.getElementById('orderTotals');
+
+            let itemsHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(function(item) {
+                const product = Store.getProductById(item.productId);
+                if (!product) return;
+                const itemTotal = product.precio * item.cantidad;
+                subtotal += itemTotal;
+
+                itemsHTML += `
+                    <div class="order-item">
+                        <img src="${product.imagen.startsWith('data:') ? product.imagen : '../' + product.imagen}" alt="${product.nombre}">
+                        <div class="order-item-info">
+                            <h4>${product.nombre}</h4>
+                            <small>Cant: ${item.cantidad}</small>
+                        </div>
+                        <span class="order-item-price">$${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            const envio = (deliveryType === 'envio' && subtotal < 100) ? 8.99 : 0;
+            const total = subtotal + envio;
+
+            totalsHTML = `
+                <div class="summary-line">
+                    <span>Subtotal</span>
+                    <span>$${subtotal.toFixed(2)}</span>
+                </div>
+                <div class="summary-line">
+                    <span>Envío</span>
+                    <span class="${envio === 0 ? 'free' : ''}">${envio === 0 ? 'GRATIS' : '$' + envio.toFixed(2)}</span>
+                </div>
+                <div class="summary-line total">
+                    <span>Total</span>
+                    <span>$${total.toFixed(2)}</span>
+                </div>
+            `;
+
+            itemsDiv.innerHTML = itemsHTML;
+            totalsDiv.innerHTML = totalsHTML;
+        }
+
+        function confirmOrder() {
+            const btn = document.getElementById('btnConfirm');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader"></i> Procesando...';
+            lucide.createIcons();
+
+            // Build order items
+            const cart = Store.getCart();
+            const items = [];
+            let total = 0;
+
+            cart.forEach(function(item) {
+                const product = Store.getProductById(item.productId);
+                if (!product) return;
+                const itemTotal = product.precio * item.cantidad;
+                total += itemTotal;
+                items.push({
+                    productId: item.productId,
+                    nombre: product.nombre,
+                    precio: product.precio,
+                    cantidad: item.cantidad
+                });
+            });
+
+            const envio = (deliveryType === 'envio' && total < 100) ? 8.99 : 0;
+            total += envio;
+
+            const direccion = deliveryType === 'envio' 
+                ? document.getElementById('checkDireccion').value + ', ' + document.getElementById('checkCiudad').value
+                : 'Recogida en tienda';
+
+            // Simulate delay
+            setTimeout(function() {
+                const order = Store.addOrder({
+                    items: items,
+                    total: total,
+                    direccion: direccion,
+                    tipoEntrega: deliveryType
+                });
+
+                // Show success
+                showSuccess(order.id);
+            }, 1000);
+        }
+
+        function showSuccess(orderId) {
+            const overlay = document.createElement('div');
+            overlay.className = 'success-overlay';
+            overlay.innerHTML = `
+                <div class="success-card">
+                    <div class="success-icon">
+                        <i data-lucide="check"></i>
+                    </div>
+                    <h2>¡Compra Realizada!</h2>
+                    <p>Tu pedido ha sido procesado exitosamente</p>
+                    <div class="order-id">${orderId}</div>
+                    <p>Recibirás los detalles por correo electrónico</p>
+                    <div>
+                        <a href="perfil.html">Ver Mis Pedidos</a>
+                        <a href="../index.html" class="secondary">Volver a la Tienda</a>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+
+        // Initial render
+        renderSummary();
+    </script>
+
+</body>
+</html>

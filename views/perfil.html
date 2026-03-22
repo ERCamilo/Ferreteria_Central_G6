@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de Usuario | Ferretería Central</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/perfil.css">
+    <style>
+        .perfil-card { position: relative; }
+        .form-group { margin-bottom: 12px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; background: #fafafa; margin-bottom: 6px; }
+        .form-group input:focus { outline: none; border-color: #F68121; background: #fff; }
+        
+        .btn-guardar { display: none; background: #16a34a; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; }
+        .btn-guardar:hover { background: #15803d; }
+        .btn-cancelar { display: none; background: #e5e7eb; color: #374151; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; }
+        .btn-cancelar:hover { background: #d1d5db; }
+
+        .editing .btn-editar { display: none; }
+        .editing .btn-guardar, .editing .btn-cancelar { display: block; }
+        .editing .info-text { display: none; }
+        .editing .info-input { display: block; }
+
+        .info-input { display: none; }
+        .info-text { display: inline-block; }
+
+        .pedidos-empty { text-align: center; padding: 40px 20px; color: #6b7280; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-badge.pendiente { background: #fef08a; color: #854d0e; }
+        .status-badge.completado { background: #dcfce7; color: #166534; }
+        .status-badge.cancelado { background: #fee2e2; color: #991b1b; }
+        
+        /* Security tab */
+        #securitySection { display: none; width: 100%; max-width: 500px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e5e7eb; }
+        #securitySection h2 { color: #0b1838; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        #securitySection h2 i { color: #F68121; }
+        .btn-security-save { background: #F68121; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; }
+        .btn-security-save:hover { background: #e5741d; }
+
+        /* Return button */
+        .sidebar-return { display: flex; align-items: center; gap: 10px; padding: 12px 20px; margin: 10px 20px; background: #F68121; color: white !important; text-decoration: none; border-radius: 8px; font-weight: 600; justify-content: center; transition: background 0.2s; }
+        .sidebar-return:hover { background: #e5741d; color: white !important; }
+        .auth-message { margin-bottom: 15px; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 500; text-align: center; }
+        .auth-message.error { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; }
+        .auth-message.success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar" style="height: 100vh; position: fixed; left: 0; top: 0;">
+       
+        <div class="header-bar">
+            <a href="../index.html"> <img class="logosidebar" src="../assets/logo.png"> </a> 
+            <h3 class="titulo-sidebar">FERRETERIA CENTRAL</h3>
+        </div>
+        
+        <a href="../index.html" class="sidebar-return">
+            <i data-lucide="arrow-left"></i>
+            Regresar a la Tienda
+        </a>
+
+        <ul class="menu">
+            <li>
+                <a href="#" onclick="switchTab('profile', this)" class="active" id="navProfile">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Información personal</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="switchTab('security', this)" id="navSecurity">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Seguridad y Contraseña</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="alert('Funcionalidad de formas de pago en desarrollo')">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Formas de pago</span>
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="#" class="sidebar-logout" onclick="logoutUser(event)">
+                <i data-lucide="log-out"></i>
+                <span class="csletra">Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+<main style="margin-left: 280px; padding: 40px; min-height: 100vh; background: #f9fafb;">
+
+    <!-- TAB: PERFIL E HISTORIAL -->
+    <div id="profileSection">
+        <section class="perfil-container" style="margin-left:0; margin-top:0;">
+            <div class="perfil-card" id="perfilCard">
+                <div class="perfil-foto">
+                    <img src="../assets/foto-de-perfil.png" alt="Foto de usuario">
+                    <input type="file" id="cambiarFoto" hidden>
+                </div>
+
+                <h2 id="viewNombre">Usuario</h2>
+                <div class="form-group info-input">
+                    <label>Nombre</label>
+                    <input type="text" id="editNombre">
+                </div>
+
+                <p><strong>Correo:</strong> <span id="viewCorreo">correo@ejemplo.com</span></p>
+
+                <p>
+                    <strong>Dirección:</strong> 
+                    <span class="info-text" id="viewDireccion">Dirección</span>
+                </p>
+                <div class="form-group info-input">
+                    <label>Dirección</label>
+                    <input type="text" id="editDireccion">
+                </div>
+
+                <p>
+                    <strong>Teléfono:</strong> 
+                    <span class="info-text" id="viewTelefono">Teléfono</span>
+                </p>
+                <div class="form-group info-input">
+                    <label>Teléfono</label>
+                    <input type="tel" id="editTelefono">
+                </div>
+
+                <button class="btn-editar" onclick="toggleEdit(true)">Editar Perfil</button>
+                <button class="btn-guardar" onclick="saveProfile()">Guardar Cambios</button>
+                <button class="btn-cancelar" onclick="toggleEdit(false)">Cancelar</button>
+            </div>
+        </section>
+
+        <section class="pedidos" style="margin-left:0; width: 100%; max-width: 800px; margin-top: 40px;">
+            <h2 style="color:#0b1838; margin-bottom:20px;">Historial de Pedidos</h2>
+            <div id="ordersContainer">
+                <!-- Rendered via JS -->
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB: SEGURIDAD -->
+    <div id="securitySection">
+        <h2><i data-lucide="shield"></i> Seguridad</h2>
+        <p style="color:#6b7280; margin-bottom:20px; font-size:14px;">Actualiza la contraseña de tu cuenta para mantenerla segura.</p>
+        
+        <div id="secMsg" style="display:none;" class="auth-message"></div>
+
+        <div class="form-group">
+            <label>Contraseña Actual</label>
+            <input type="password" id="currentPass" placeholder="Ingresa tu contraseña actual">
+        </div>
+        <div class="form-group">
+            <label>Nueva Contraseña</label>
+            <input type="password" id="newPass" placeholder="Ingresa tu nueva contraseña">
+        </div>
+        <div class="form-group">
+            <label>Confirmar Nueva Contraseña</label>
+            <input type="password" id="confirmPass" placeholder="Repite tu nueva contraseña">
+        </div>
+
+        <button class="btn-security-save" onclick="updatePassword()">Actualizar Contraseña</button>
+    </div>
+
+</main>
+
+    <script src="../js/datos/db.js"></script>
+    <script src="../js/datos/productos.js"></script>
+    <script src="../js/datos/auth.js"></script>
+    <script src="../js/datos/carrito.js"></script>
+    <script src="../js/datos/pedidos.js"></script>
+    <script src="../js/store.js"></script>
+<script>
+    lucide.createIcons();
+
+    // Redirigir si no hay sesión
+    const session = Store.getSession();
+    if (!session) {
+        window.location.href = '../login.html';
+    }
+
+    // Tabs logic
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.sidebar .menu a').forEach(a => a.classList.remove('active'));
+        if(el) el.classList.add('active');
+
+        document.getElementById('profileSection').style.display = tabId === 'profile' ? 'block' : 'none';
+        document.getElementById('securitySection').style.display = tabId === 'security' ? 'block' : 'none';
+    }
+
+    // Inicializar perfil
+    function loadProfile() {
+        document.getElementById('viewNombre').textContent = session.nombre;
+        document.getElementById('viewCorreo').textContent = session.email;
+        document.getElementById('viewDireccion').textContent = session.direccion || 'No especificada';
+        document.getElementById('viewTelefono').textContent = session.telefono || 'No especificado';
+        
+        document.getElementById('editNombre').value = session.nombre;
+        document.getElementById('editDireccion').value = session.direccion || '';
+        document.getElementById('editTelefono').value = session.telefono || '';
+    }
+
+    function toggleEdit(isEditing) {
+        const card = document.getElementById('perfilCard');
+        if (isEditing) {
+            card.classList.add('editing');
+        } else {
+            card.classList.remove('editing');
+            loadProfile();
+        }
+    }
+
+    function saveProfile() {
+        const newNombre = document.getElementById('editNombre').value.trim();
+        const newDireccion = document.getElementById('editDireccion').value.trim();
+        const newTelefono = document.getElementById('editTelefono').value.trim();
+
+        if (!newNombre) {
+            alert('El nombre es obligatorio');
+            return;
+        }
+
+        const success = Store.updateUser(session.id, {
+            nombre: newNombre,
+            direccion: newDireccion,
+            telefono: newTelefono
+        });
+
+        if (success) {
+            session.nombre = newNombre;
+            session.direccion = newDireccion;
+            session.telefono = newTelefono;
+            
+            toggleEdit(false);
+            loadProfile();
+            
+            const btn = document.querySelector('.btn-editar');
+            const originalText = btn.textContent;
+            btn.textContent = '¡Guardado!';
+            btn.style.background = '#16a34a';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        } else {
+            alert('Error al guardar el perfil');
+        }
+    }
+
+    function updatePassword() {
+        const current = document.getElementById('currentPass').value;
+        const newP = document.getElementById('newPass').value;
+        const confP = document.getElementById('confirmPass').value;
+        const msg = document.getElementById('secMsg');
+
+        msg.style.display = 'block';
+
+        if (!current || !newP || !confP) {
+            msg.className = 'auth-message error';
+            msg.textContent = 'Todos los campos son obligatorios.';
+            return;
+        }
+
+        if (newP !== confP) {
+            msg.className = 'auth-message error';
+            msg.textContent = 'Las nuevas contraseñas no coinciden.';
+            return;
+        }
+
+        if (newP.length < 6) {
+            msg.className = 'auth-message error';
+            msg.textContent = 'La nueva contraseña debe tener al menos 6 caracteres.';
+            return;
+        }
+
+        // Verify current password matches the session
+        const users = Store.getUsers();
+        const user = users.find(u => u.id === session.id);
+        
+        if (!user || user.password !== current) {
+            msg.className = 'auth-message error';
+            msg.textContent = 'La contraseña actual es incorrecta.';
+            return;
+        }
+
+        // Save new password
+        Store.updateUser(session.id, { password: newP });
+        
+        msg.className = 'auth-message success';
+        msg.textContent = 'Contraseña actualizada exitosamente.';
+        
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+
+        setTimeout(() => { msg.style.display = 'none'; }, 3000);
+    }
+
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+            Store.logout();
+            window.location.href = '../index.html';
+        }
+    }
+
+    function loadOrders() {
+        const orders = Store.getOrdersByUser(session.id);
+        const container = document.getElementById('ordersContainer');
+
+        if (orders.length === 0) {
+            container.innerHTML = '<div class="pedidos-empty">No has realizado ningún pedido aún.</div>';
+            return;
+        }
+
+        orders.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        let tableStr = `
+            <table>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th>Acción</th>
+                </tr>
+        `;
+
+        orders.forEach(order => {
+            const date = new Date(order.fecha).toLocaleDateString();
+            const badgeClass = order.estado === 'pendiente' ? 'pendiente' 
+                             : order.estado === 'completado' ? 'completado' 
+                             : 'cancelado';
+            
+            tableStr += `
+                <tr>
+                    <td><strong>${order.id}</strong><br><small>${order.items.length} items</small></td>
+                    <td>${date}</td>
+                    <td><span class="status-badge ${badgeClass}">${order.estado.toUpperCase()}</span></td>
+                    <td>$${order.total.toFixed(2)}</td>
+                    <td><button onclick="alert('Funcionalidad de ver detalle en desarrollo.')" style="padding:4px 8px;font-size:12px;background:#eee;border:1px solid #ccc;border-radius:4px;cursor:pointer;">Ver</button></td>
+                </tr>
+            `;
+        });
+
+        tableStr += '</table>';
+        container.innerHTML = tableStr;
+    }
+
+    // Inicializar página
+    loadProfile();
+    loadOrders();
+
+</script>
+</body>
+</html>

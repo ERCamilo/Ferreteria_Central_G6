@@ -8,92 +8,13 @@
     <meta name="description"
         content="Ferretería Central: materiales, herramientas y equipos de construcción. Compra en línea y recoge en tienda o recibe a domicilio.">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/header.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
 
-    <!-- TOP HEADER BAR -->
-    <header class="top-header">
-        <div class="header-inner">
-
-            <!-- Logo -->
-            <a href="index.html" class="header-logo">
-                <img src="assets/logo.png" alt="Ferretería Central" class="header-logo-img">
-                <div class="header-logo-text">
-                    <span class="logo-name">Ferretería</span>
-                    <span class="logo-sub">Central</span>
-                </div>
-            </a>
-
-            <!-- Delivery Info -->
-            <div class="header-deliver">
-                <i data-lucide="map-pin"></i>
-                <div>
-                    <small>Enviar a</small>
-                    <strong>Santo Domingo</strong>
-                </div>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="header-search">
-                <select class="search-category" id="searchCategory">
-                    <option value="">Todos</option>
-                    <option value="herramientas">Herramientas</option>
-                    <option value="materiales">Materiales</option>
-                    <option value="equipos">Equipos</option>
-                    <option value="electricidad">Electricidad</option>
-                    <option value="plomeria">Plomería</option>
-                    <option value="pintura">Pintura</option>
-                </select>
-                <input type="text" placeholder="Buscar productos..." class="search-input" id="searchInput">
-                <button class="search-btn" id="searchBtn">
-                    <i data-lucide="search"></i>
-                </button>
-            </div>
-
-            <!-- Account -->
-            <a href="login.html" class="header-account">
-                <small>Hola, Identifícate</small>
-                <strong>Cuenta <i data-lucide="chevron-down"></i></strong>
-            </a>
-
-            <!-- Orders -->
-            <a href="#" class="header-orders">
-                <small>Devoluciones</small>
-                <strong>y Pedidos</strong>
-            </a>
-
-            <!-- Cart -->
-            <a href="#" class="header-cart" id="headerCart">
-                <i data-lucide="shopping-cart"></i>
-                <span class="cart-count">0</span>
-                <strong>Carrito</strong>
-            </a>
-
-        </div>
-    </header>
-
-    <!-- NAVIGATION BAR -->
-    <nav class="main-nav">
-        <div class="nav-inner">
-            <div class="nav-links">
-                <button class="nav-menu-btn" id="navMenuBtn">
-                    <i data-lucide="menu"></i>
-                    <span>Menú</span>
-                </button>
-                <a href="index.html" class="nav-link active">Inicio</a>
-                <a href="#" class="nav-link">Ofertas</a>
-                <a href="#" class="nav-link">Novedades</a>
-                <a href="#" class="nav-link">Más Vendidos</a>
-                <a href="#" class="nav-link">Herramientas Eléctricas</a>
-                <a href="#" class="nav-link">Manuales</a>
-            </div>
-            <div class="nav-promo">
-                <span>Envío <strong>GRATIS</strong> en compras +$100</span>
-            </div>
-        </div>
-    </nav>
+    <div id="app-header" data-base-path="./"></div>
 
     <!-- MAIN CONTENT -->
     <main class="store-main">
@@ -105,186 +26,7 @@
 
         <!-- Product Grid -->
         <div class="product-grid" id="productGrid">
-
-            <!-- Product 1 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--electric">Herramientas Eléctricas</span>
-                    <img src="assets/taladro.avif" alt="Taladro Percutor 750W" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Taladro Percutor 750W</h3>
-                    <p class="store-card__desc">Taladro percutor profesional con velocidad variable y mango auxiliar.
-                    </p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$129.99</span>
-                            <small class="store-card__stock">15 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 2 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--manual">Herramientas Manuales</span>
-                    <img src="assets/caja-herramientas.jpeg" alt="Juego de Llaves Combinadas" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Juego de Llaves Combinadas</h3>
-                    <p class="store-card__desc">Set completo de llaves combinadas en acero cromo-vanadio.</p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$89.99</span>
-                            <small class="store-card__stock">20 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 3 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--electric">Herramientas Eléctricas</span>
-                    <img src="assets/compresor.jpeg" alt="Amoladora Angular 115mm" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Amoladora Angular 115mm</h3>
-                    <p class="store-card__desc">Amoladora angular de 900W con disco de 115mm y protección de seguridad.
-                    </p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$79.99</span>
-                            <small class="store-card__stock">12 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 4 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--storage">Almacenamiento</span>
-                    <img src="assets/caja-herramientas.jpeg" alt="Caja de Herramientas Pro" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Caja de Herramientas Pro</h3>
-                    <p class="store-card__desc">Caja de herramientas resistente con 5 compartimentos y cerradura.</p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$59.99</span>
-                            <small class="store-card__stock">25 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 5 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--manual">Herramientas Manuales</span>
-                    <img src="assets/taladro.avif" alt="Martillo Carpintero 20oz" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Martillo Carpintero 20oz</h3>
-                    <p class="store-card__desc">Martillo de acero forjado con mango de fibra de vidrio anti-vibración.
-                    </p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$24.99</span>
-                            <small class="store-card__stock">50 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 6 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--electric">Herramientas Eléctricas</span>
-                    <img src="assets/compresor.jpeg" alt="Sierra Circular 7-1/4" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Sierra Circular 7-1/4"</h3>
-                    <p class="store-card__desc">Sierra circular de 1800W con guía laser y disco incluido.</p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$149.99</span>
-                            <small class="store-card__stock">8 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 7 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--manual">Herramientas Manuales</span>
-                    <img src="assets/taladro.avif" alt="Destornillador Set 32pcs" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Destornillador Set 32pcs</h3>
-                    <p class="store-card__desc">Set profesional de 32 puntas magnéticas con estuche organizador.</p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$34.99</span>
-                            <small class="store-card__stock">40 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Product 8 -->
-            <article class="store-card">
-                <div class="store-card__image">
-                    <span class="category-badge badge--measure">Medición</span>
-                    <img src="assets/compresor.jpeg" alt="Nivel Láser 360°" loading="lazy">
-                </div>
-                <div class="store-card__body">
-                    <h3 class="store-card__title">Nivel Láser 360°</h3>
-                    <p class="store-card__desc">Nivel láser autonivelante con alcance de 30m y trípode incluido.</p>
-                    <div class="store-card__footer">
-                        <div class="store-card__pricing">
-                            <span class="store-card__price">$89.99</span>
-                            <small class="store-card__stock">18 unidades disponibles</small>
-                        </div>
-                        <button class="add-cart-btn">
-                            <i data-lucide="shopping-cart"></i>
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </article>
-
+            <!-- Productos cargados dinámicamente por app.js -->
         </div>
 
     </main>
@@ -297,7 +39,7 @@
         <div class="footer-main">
             <div class="footer-col">
                 <h4>Conócenos</h4>
-                <a href="nosotros.html">Sobre nosotros</a>
+                <a href="views/nosotros.html">Sobre nosotros</a>
                 <a href="#">Trabaja con nosotros</a>
                 <a href="#">Sucursales</a>
             </div>
@@ -320,10 +62,34 @@
         </div>
     </footer>
 
-    <script type = "module" src="js/app.js">
+    <script src="js/datos/db.js"></script>
+    <script src="js/datos/productos.js"></script>
+    <script src="js/datos/auth.js"></script>
+    <script src="js/datos/carrito.js"></script>
+    <script src="js/datos/pedidos.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/app.js"></script>
+    <script>
         // Initialize Lucide icons
         lucide.createIcons();
-        
+
+        // Actualizar header según sesión
+        (function() {
+            const session = Store.getSession();
+            const accountLink = document.getElementById('headerAccount');
+            if (session && accountLink) {
+                accountLink.innerHTML = '<small>Hola, ' + session.nombre.split(' ')[0] + '</small><strong>Mi Cuenta <i data-lucide="chevron-down"></i></strong>';
+                accountLink.href = 'views/perfil.html';
+                lucide.createIcons();
+            }
+
+            // Actualizar contador del carrito
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = Store.getCartCount();
+            }
+        })();
     </script>
 
 </body>

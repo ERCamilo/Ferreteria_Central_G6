@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta | Ferretería Central</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="auth-body">
+
+    <main class="auth-wrapper">
+
+        <div class="auth-card">
+
+            <!-- Logo -->
+            <a href="../index.html" class="auth-logo">
+                <img src="../assets/logo.png" alt="Ferretería Central">
+                <h1>Ferretería Central</h1>
+            </a>
+
+            <h2 class="auth-title">Crear Cuenta</h2>
+            <p class="auth-subtitle">Regístrate para empezar a comprar</p>
+
+            <!-- Mensaje de error -->
+            <div class="auth-message" id="authMessage" style="display:none;"></div>
+
+            <form class="auth-form" id="registerForm">
+
+                <div class="form-group">
+                    <label for="regNombre">
+                        <i data-lucide="user"></i> Nombre completo
+                    </label>
+                    <input type="text" id="regNombre" placeholder="Tu nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regEmail">
+                        <i data-lucide="mail"></i> Correo electrónico
+                    </label>
+                    <input type="email" id="regEmail" placeholder="tu@correo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">
+                        <i data-lucide="lock"></i> Contraseña
+                    </label>
+                    <input type="password" id="regPassword" placeholder="Mínimo 4 caracteres" required minlength="4">
+                </div>
+
+                <div class="form-group">
+                    <label for="regTelefono">
+                        <i data-lucide="phone"></i> Teléfono
+                    </label>
+                    <input type="tel" id="regTelefono" placeholder="809-000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="regDireccion">
+                        <i data-lucide="map-pin"></i> Dirección
+                    </label>
+                    <input type="text" id="regDireccion" placeholder="Tu dirección de envío">
+                </div>
+
+                <button type="submit" class="btn-primary full-width" id="registerBtn">
+                    <i data-lucide="user-plus"></i>
+                    Crear Cuenta
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                <p>¿Ya tienes cuenta? <a href="../login.html">Iniciar sesión</a></p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="../js/datos/db.js"></script>
+    <script src="../js/datos/productos.js"></script>
+    <script src="../js/datos/auth.js"></script>
+    <script src="../js/datos/carrito.js"></script>
+    <script src="../js/datos/pedidos.js"></script>
+    <script src="../js/store.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const form = document.getElementById('registerForm');
+        const msgDiv = document.getElementById('authMessage');
+
+        function showMessage(text, type) {
+            msgDiv.textContent = text;
+            msgDiv.className = 'auth-message auth-message--' + type;
+            msgDiv.style.display = 'block';
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const userData = {
+                nombre: document.getElementById('regNombre').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                password: document.getElementById('regPassword').value,
+                telefono: document.getElementById('regTelefono').value.trim(),
+                direccion: document.getElementById('regDireccion').value.trim()
+            };
+
+            // Validaciones
+            if (userData.nombre.length < 2) {
+                showMessage('El nombre debe tener al menos 2 caracteres.', 'error');
+                return;
+            }
+
+            const result = Store.addUser(userData);
+
+            if (result.success) {
+                // Redirigir al login con mensaje de éxito
+                window.location.href = '../login.html?registered=1';
+            } else {
+                showMessage(result.error, 'error');
+            }
+        });
+    </script>
+
+</body>
+</html>
