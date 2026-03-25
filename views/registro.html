@@ -79,6 +79,10 @@
 
     </main>
 
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+
     <script src="../js/datos/db.js"></script>
     <script src="../js/datos/productos.js"></script>
     <script src="../js/datos/auth.js"></script>
@@ -97,7 +101,7 @@
             msgDiv.style.display = 'block';
         }
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const userData = {
@@ -108,19 +112,27 @@
                 direccion: document.getElementById('regDireccion').value.trim()
             };
 
-            // Validaciones
+            // Validaciones básicas
             if (userData.nombre.length < 2) {
                 showMessage('El nombre debe tener al menos 2 caracteres.', 'error');
                 return;
             }
 
-            const result = Store.addUser(userData);
+            // Mostrar estado de carga
+            const btn = document.getElementById('registerBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Creando cuenta...';
+
+            const result = await Store.addUser(userData);
 
             if (result.success) {
                 // Redirigir al login con mensaje de éxito
                 window.location.href = '../login.html?registered=1';
             } else {
-                showMessage(result.error, 'error');
+                showMessage(result.error || 'Error al crear la cuenta', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     </script>

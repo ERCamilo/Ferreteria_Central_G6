@@ -48,25 +48,19 @@ window.CartService = (function (DB) {
         return getCart().reduce((total, item) => total + item.cantidad, 0);
     }
 
-    function getCartTotal() {
+    async function getCartTotal() {
         const cart = getCart();
         let total = 0;
-        cart.forEach(item => {
-            // Dependencia circular aparente con ProductService, resuelta globalmente por window.Store o window.ProductService
-            // Para mantener total desacoplamiento, usamos la vista global de ProductService si existe, 
-            // sino hacemos la búsqueda manual en la DB.
+        for (const item of cart) {
             let product = null;
-            if (window.ProductService) {
-                product = window.ProductService.getProductById(item.productId);
-            } else {
-                const products = DB.get(DB.KEYS.PRODUCTS) || [];
-                product = products.find(p => p.id === item.productId);
+            if (window.Store && typeof window.Store.getProductById === 'function') {
+                product = await window.Store.getProductById(item.productId);
             }
 
             if (product) {
                 total += product.precio * item.cantidad;
             }
-        });
+        }
         return total;
     }
 

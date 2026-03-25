@@ -201,6 +201,10 @@
 
     </main>
 
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+
     <script src="../js/datos/db.js"></script>
     <script src="../js/datos/productos.js"></script>
     <script src="../js/datos/auth.js"></script>
@@ -213,13 +217,15 @@
         let deliveryType = 'envio';
 
         // Pre-fill form from session
-        (function() {
-            const session = Store.getSession();
+        (async function() {
+            const session = await Store.getSession();
             if (session) {
-                document.getElementById('checkNombre').value = session.nombre || '';
-                document.getElementById('checkTelefono').value = session.telefono || '';
-                document.getElementById('checkDireccion').value = session.direccion || '';
+                document.getElementById('checkNombre').value = session.full_name || '';
+                document.getElementById('checkTelefono').value = session.phone || '';
+                document.getElementById('checkDireccion').value = session.address || '';
             }
+            // Render inicial después de cargar la sesión
+            await renderSummary();
         })();
 
         // Check cart is not empty
@@ -235,23 +241,25 @@
             renderSummary();
         }
 
-        function renderSummary() {
+        async function renderSummary() {
             const cart = Store.getCart();
             const itemsDiv = document.getElementById('orderItems');
             const totalsDiv = document.getElementById('orderTotals');
 
+            if (!itemsDiv) return;
+
             let itemsHTML = '';
             let subtotal = 0;
 
-            cart.forEach(function(item) {
-                const product = Store.getProductById(item.productId);
-                if (!product) return;
+            for (const item of cart) {
+                const product = await Store.getProductById(item.productId);
+                if (!product) continue;
                 const itemTotal = product.precio * item.cantidad;
                 subtotal += itemTotal;
 
                 itemsHTML += `
                     <div class="order-item">
-                        <img src="${product.imagen.startsWith('data:') ? product.imagen : '../' + product.imagen}" alt="${product.nombre}">
+                        <img src="${product.imagen.startsWith('http') ? product.imagen : '../' + product.imagen}" alt="${product.nombre}">
                         <div class="order-item-info">
                             <h4>${product.nombre}</h4>
                             <small>Cant: ${item.cantidad}</small>
@@ -259,12 +267,12 @@
                         <span class="order-item-price">$${itemTotal.toFixed(2)}</span>
                     </div>
                 `;
-            });
+            }
 
             const envio = (deliveryType === 'envio' && subtotal < 100) ? 8.99 : 0;
             const total = subtotal + envio;
 
-            totalsHTML = `
+            const totalsHTML = `
                 <div class="summary-line">
                     <span>Subtotal</span>
                     <span>$${subtotal.toFixed(2)}</span>
@@ -283,49 +291,52 @@
             totalsDiv.innerHTML = totalsHTML;
         }
 
-        function confirmOrder() {
+        async function confirmOrder() {
             const btn = document.getElementById('btnConfirm');
             btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader"></i> Procesando...';
+            btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Procesando...';
             lucide.createIcons();
 
-            // Build order items
-            const cart = Store.getCart();
-            const items = [];
-            let total = 0;
+            try {
+                // Build order items
+                const cart = Store.getCart();
+                const items = [];
+                let subtotal = 0;
 
-            cart.forEach(function(item) {
-                const product = Store.getProductById(item.productId);
-                if (!product) return;
-                const itemTotal = product.precio * item.cantidad;
-                total += itemTotal;
-                items.push({
-                    productId: item.productId,
-                    nombre: product.nombre,
-                    precio: product.precio,
-                    cantidad: item.cantidad
-                });
-            });
+                for (const item of cart) {
+                    const product = await Store.getProductById(item.productId);
+                    if (!product) continue;
+                    const itemTotal = product.precio * item.cantidad;
+                    subtotal += itemTotal;
+                    items.push({
+                        productId: item.productId,
+                        precio: product.precio,
+                        cantidad: item.cantidad
+                    });
+                }
 
-            const envio = (deliveryType === 'envio' && total < 100) ? 8.99 : 0;
-            total += envio;
+                const envio = (deliveryType === 'envio' && subtotal < 100) ? 8.99 : 0;
+                const total = subtotal + envio;
 
-            const direccion = deliveryType === 'envio' 
-                ? document.getElementById('checkDireccion').value + ', ' + document.getElementById('checkCiudad').value
-                : 'Recogida en tienda';
-
-            // Simulate delay
-            setTimeout(function() {
-                const order = Store.addOrder({
+                const result = await Store.addOrder({
                     items: items,
                     total: total,
-                    direccion: direccion,
                     tipoEntrega: deliveryType
                 });
 
-                // Show success
-                showSuccess(order.id);
-            }, 1000);
+                if (result.success) {
+                    showSuccess(result.order.id);
+                } else {
+                    alert('Error al procesar el pedido: ' + result.error);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i data-lucide="check-circle"></i> Confirmar Compra';
+                }
+            } catch (err) {
+                alert('Ocurrió un error inesperado.');
+                btn.disabled = false;
+                btn.innerHTML = '<i data-lucide="check-circle"></i> Confirmar Compra';
+            }
+            lucide.createIcons();
         }
 
         function showSuccess(orderId) {

@@ -76,6 +76,10 @@
 
     </main>
 
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+
     <script src="js/datos/db.js"></script>
     <script src="js/datos/productos.js"></script>
     <script src="js/datos/auth.js"></script>
@@ -121,29 +125,41 @@
             showMessage('¡Cuenta creada exitosamente! Ya puedes iniciar sesión.', 'success');
         }
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             const email = emailInput.value.trim();
             const password = passInput.value;
 
-            const result = Store.login(email, password);
+            // Mostrar estado de carga en el botón
+            const originalBtnText = loginBtn.innerHTML;
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i data-lucide="loader" class="spin"></i> Ingresando...';
+            lucide.createIcons();
+
+            const result = await Store.login(email, password);
 
             if (result.success) {
-                // Verificar que el rol coincide con la pestaña seleccionada para mejor UX
-                if (result.user.rol !== currentRole) {
-                    showMessage('Credenciales válidas, pero el tipo de cuenta no coincide con la pestaña seleccionada.', 'error');
+                // Verificar que el rol coincide con la pestaña seleccionada
+                if (result.user.role !== currentRole) {
+                    showMessage('Credenciales válidas, pero el tipo de cuenta no coincide.', 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalBtnText;
+                    lucide.createIcons();
                     return;
                 }
 
                 // Redirigir según rol
-                if (result.user.rol === 'admin') {
+                if (result.user.role === 'admin') {
                     window.location.href = 'dashboard.html';
                 } else {
                     window.location.href = 'index.html';
                 }
             } else {
-                showMessage(result.error, 'error');
+                showMessage(result.error || 'Error al iniciar sesión', 'error');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalBtnText;
+                lucide.createIcons();
             }
         });
     </script>

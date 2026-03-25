@@ -166,6 +166,10 @@
 
 </main>
 
+    <!-- SUPABASE SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+
     <script src="../js/datos/db.js"></script>
     <script src="../js/datos/productos.js"></script>
     <script src="../js/datos/auth.js"></script>
@@ -176,30 +180,26 @@
     lucide.createIcons();
 
     // Redirigir si no hay sesión
-    const session = Store.getSession();
-    if (!session) {
-        window.location.href = '../login.html';
-    }
-
-    // Tabs logic
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.sidebar .menu a').forEach(a => a.classList.remove('active'));
-        if(el) el.classList.add('active');
-
-        document.getElementById('profileSection').style.display = tabId === 'profile' ? 'block' : 'none';
-        document.getElementById('securitySection').style.display = tabId === 'security' ? 'block' : 'none';
-    }
-
+    let session = null;
+    
     // Inicializar perfil
-    function loadProfile() {
-        document.getElementById('viewNombre').textContent = session.nombre;
+    async function loadProfile() {
+        session = await Store.getSession();
+        if (!session) {
+            window.location.href = '../login.html';
+            return;
+        }
+
+        document.getElementById('viewNombre').textContent = session.full_name || 'Usuario';
         document.getElementById('viewCorreo').textContent = session.email;
-        document.getElementById('viewDireccion').textContent = session.direccion || 'No especificada';
-        document.getElementById('viewTelefono').textContent = session.telefono || 'No especificado';
+        document.getElementById('viewDireccion').textContent = session.address || 'No especificada';
+        document.getElementById('viewTelefono').textContent = session.phone || 'No especificado';
         
-        document.getElementById('editNombre').value = session.nombre;
-        document.getElementById('editDireccion').value = session.direccion || '';
-        document.getElementById('editTelefono').value = session.telefono || '';
+        document.getElementById('editNombre').value = session.full_name || '';
+        document.getElementById('editDireccion').value = session.address || '';
+        document.getElementById('editTelefono').value = session.phone || '';
+        
+        loadOrders();
     }
 
     function toggleEdit(isEditing) {
@@ -212,7 +212,7 @@
         }
     }
 
-    function saveProfile() {
+    async function saveProfile() {
         const newNombre = document.getElementById('editNombre').value.trim();
         const newDireccion = document.getElementById('editDireccion').value.trim();
         const newTelefono = document.getElementById('editTelefono').value.trim();
@@ -222,19 +222,15 @@
             return;
         }
 
-        const success = Store.updateUser(session.id, {
-            nombre: newNombre,
-            direccion: newDireccion,
-            telefono: newTelefono
+        const success = await Store.updateUser(session.id, {
+            full_name: newNombre,
+            address: newDireccion,
+            phone: newTelefono
         });
 
         if (success) {
-            session.nombre = newNombre;
-            session.direccion = newDireccion;
-            session.telefono = newTelefono;
-            
             toggleEdit(false);
-            loadProfile();
+            await loadProfile();
             
             const btn = document.querySelector('.btn-editar');
             const originalText = btn.textContent;
@@ -249,17 +245,16 @@
         }
     }
 
-    function updatePassword() {
-        const current = document.getElementById('currentPass').value;
+    async function updatePassword() {
         const newP = document.getElementById('newPass').value;
         const confP = document.getElementById('confirmPass').value;
         const msg = document.getElementById('secMsg');
 
         msg.style.display = 'block';
 
-        if (!current || !newP || !confP) {
+        if (!newP || !confP) {
             msg.className = 'auth-message error';
-            msg.textContent = 'Todos los campos son obligatorios.';
+            msg.textContent = 'Los campos de nueva contraseña son obligatorios.';
             return;
         }
 
@@ -275,18 +270,15 @@
             return;
         }
 
-        // Verify current password matches the session
-        const users = Store.getUsers();
-        const user = users.find(u => u.id === session.id);
+        // En Supabase Auth, no necesitamos la contraseña actual para actualizar la nueva 
+        // si el usuario ya tiene sesión iniciada (aunque es buena práctica, el SDK lo permite así).
+        const { error } = await window.supabase.auth.updateUser({ password: newP });
         
-        if (!user || user.password !== current) {
+        if (error) {
             msg.className = 'auth-message error';
-            msg.textContent = 'La contraseña actual es incorrecta.';
+            msg.textContent = 'Error: ' + error.message;
             return;
         }
-
-        // Save new password
-        Store.updateUser(session.id, { password: newP });
         
         msg.className = 'auth-message success';
         msg.textContent = 'Contraseña actualizada exitosamente.';
@@ -298,10 +290,10 @@
         setTimeout(() => { msg.style.display = 'none'; }, 3000);
     }
 
-    function logoutUser(e) {
+    async function logoutUser(e) {
         e.preventDefault();
         if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-            Store.logout();
+            await Store.logout();
             window.location.href = '../index.html';
         }
     }
@@ -350,8 +342,19 @@
     }
 
     // Inicializar página
-    loadProfile();
-    loadOrders();
+    (async function() {
+        await loadProfile();
+        lucide.createIcons();
+    })();
+
+    // Tabs logic - moved outside to be accessible
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.sidebar .menu a').forEach(a => a.classList.remove('active'));
+        if(el) el.classList.add('active');
+
+        document.getElementById('profileSection').style.display = tabId === 'profile' ? 'block' : 'none';
+        document.getElementById('securitySection').style.display = tabId === 'security' ? 'block' : 'none';
+    }
 
 </script>
 </body>

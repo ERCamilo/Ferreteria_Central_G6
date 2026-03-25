@@ -130,35 +130,35 @@
     // ===========================
     // VISTAS DINÁMICAS
     // ===========================
-    function initViewScripts(viewName) {
+    async function initViewScripts(viewName) {
         if (viewName === 'inicio') {
-            renderInicio();
+            await renderInicio();
         } else if (viewName === 'inventario') {
-            renderInventario();
+            await renderInventario();
         } else if (viewName === 'registrar-productos') {
-            initRegistrarProductos();
+            await initRegistrarProductos();
         } else if (viewName === 'pedidos') {
-            renderPedidos();
+            await renderPedidos();
         } else if (viewName === 'clientes') {
-            renderClientes();
+            await renderClientes();
         } else if (viewName === 'ventas') {
-            renderVentas();
+            await renderVentas();
         }
     }
 
     // --- INICIO ---
-    function renderInicio() {
+    async function renderInicio() {
         if (!window.Store) return;
 
-        const orders = window.Store.getOrders() || [];
-        const products = window.Store.getProducts() || [];
-        const ventasCompletadas = orders.filter(o => o.estado === 'completado');
+        const orders = await window.Store.getOrders() || [];
+        const products = await window.Store.getProducts() || [];
+        const ventasCompletadas = orders.filter(o => o.status === 'completado');
         const totalVentas = ventasCompletadas.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
         const numeroPedidos = orders.length;
 
-        // Calculo de clientes
-        const allUsers = JSON.parse(localStorage.getItem('fc_users')) || [];
-        const numeroClientes = allUsers.filter(u => u.rol !== 'admin').length;
+        // Clientes desde tabla profiles
+        const { data: profiles } = await window.supabase.from('profiles').select('*');
+        const numeroClientes = profiles ? profiles.filter(u => u.role !== 'admin').length : 0;
 
         // Inyectar stats principales
         const ventasEl = document.getElementById('inicioTotalVentas');
@@ -252,11 +252,11 @@
     }
 
     // --- INVENTARIO ---
-    function renderInventario() {
+    async function renderInventario() {
         const tbody = document.getElementById('inventoryTableBody');
         if (!tbody) return;
 
-        const products = window.Store ? window.Store.getProducts() : [];
+        const products = window.Store ? await window.Store.getProducts() : [];
         
         if (products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay productos registrados en el inventario.</td></tr>';
@@ -302,17 +302,17 @@
     };
 
     // --- PEDIDOS ---
-    function renderPedidos() {
+    async function renderPedidos() {
         const tbody = document.getElementById('adminOrdersTableBody');
         if (!tbody || !window.Store) return;
 
-        const orders = window.Store.getOrders();
+        const orders = await window.Store.getOrders();
         
         // Actualizar mini-stats
-        const pPendientes = orders.filter(o => o.estado === 'pendiente').length;
-        const pProceso = orders.filter(o => o.estado === 'procesando').length;
-        const pCompletados = orders.filter(o => o.estado === 'completado').length;
-        const pRecogida = orders.filter(o => o.tipoEntrega === 'recogida' && o.estado !== 'completado').length;
+        const pPendientes = orders.filter(o => o.status === 'pendiente').length;
+        const pProceso = orders.filter(o => o.status === 'procesando').length;
+        const pCompletados = orders.filter(o => o.status === 'completado').length;
+        const pRecogida = orders.filter(o => o.type === 'recogida' && o.status !== 'completado').length;
 
         if (document.getElementById('pedidosPendientes')) document.getElementById('pedidosPendientes').textContent = pPendientes;
         if (document.getElementById('pedidosProceso')) document.getElementById('pedidosProceso').textContent = pProceso;
@@ -338,9 +338,9 @@
             
             let badgeClass = 'warning';
             let estadoLabel = 'Pendiente';
-            if (order.estado === 'completado') { badgeClass = 'success'; estadoLabel = 'Completado'; }
-            else if (order.estado === 'cancelado') { badgeClass = 'danger'; estadoLabel = 'Cancelado'; }
-            else if (order.estado === 'procesando') { badgeClass = 'info'; estadoLabel = 'En Proceso'; }
+            if (order.status === 'completado') { badgeClass = 'success'; estadoLabel = 'Completado'; }
+            else if (order.status === 'cancelado') { badgeClass = 'danger'; estadoLabel = 'Cancelado'; }
+            else if (order.status === 'procesando') { badgeClass = 'info'; estadoLabel = 'En Proceso'; }
 
             const deliveryIcon = order.tipoEntrega === 'envio' ? '<i data-lucide="truck"></i> Envío' : '<i data-lucide="store"></i> Recogida';
             const deliveryClass = order.tipoEntrega === 'envio' ? 'shipping' : 'pickup';
@@ -369,12 +369,14 @@
     }
 
     // --- CLIENTES ---
-    function renderClientes() {
+    async function renderClientes() {
         const tbody = document.getElementById('adminClientesTableBody');
         if (!tbody) return;
 
-        const allUsers = JSON.parse(localStorage.getItem('fc_users')) || [];
-        const clientes = allUsers.filter(u => u.rol !== 'admin');
+        const { data: profiles, error } = await window.supabase.from('profiles').select('*');
+        if (error) return;
+
+        const clientes = profiles.filter(u => u.role !== 'admin');
 
         // Actualizar mini-stats
         if (document.getElementById('clientesTotal')) document.getElementById('clientesTotal').textContent = clientes.length;
@@ -386,31 +388,32 @@
             return;
         }
 
-        const orders = window.Store.getOrders() || [];
+        const orders = await window.Store.getOrders() || [];
 
         let rows = '';
         clientes.forEach(c => {
             // Filtrar órdenes de este cliente
-            const userOrders = orders.filter(o => o.userId === c.id || o.email === c.email);
-            const totalGasto = userOrders.filter(o => o.estado === 'completado').reduce((sum, o) => sum + o.total, 0);
+            const userOrders = orders.filter(o => o.userId === c.id);
+            const totalGasto = userOrders.filter(o => o.status === 'completado').reduce((sum, o) => sum + o.total, 0);
             const numOrders = userOrders.length;
             
             // Última compra
             let ultimaCompra = '-';
             if (numOrders > 0) {
-                const lastDate = new Date(Math.max(...userOrders.map(o => new Date(o.fecha))));
+                const dates = userOrders.map(o => new Date(o.fecha).getTime());
+                const lastDate = new Date(Math.max(...dates));
                 ultimaCompra = lastDate.toLocaleDateString();
             }
 
-            const initial = c.nombre ? c.nombre.charAt(0).toUpperCase() : 'C';
+            const initial = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'C';
             rows += `
                 <tr>
                     <td class="product-cell">
                         <div class="client-avatar">${initial}</div>
-                        ${c.nombre}
+                        ${c.full_name || 'Sin Nombre'}
                     </td>
                     <td>${c.email}</td>
-                    <td>${c.telefono || '-'}</td>
+                    <td>${c.phone || '-'}</td>
                     <td><strong>${numOrders}</strong> pedidos</td>
                     <td><strong>$${parseFloat(totalGasto || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
                     <td>${ultimaCompra}</td>
@@ -422,12 +425,12 @@
     }
 
     // --- VENTAS ---
-    function renderVentas() {
+    async function renderVentas() {
         const tbody = document.getElementById('adminVentasTableBody');
         if (!tbody || !window.Store) return;
 
-        const allOrders = window.Store.getOrders();
-        const sales = allOrders.filter(o => o.estado === 'completado');
+        const allOrders = await window.Store.getOrders();
+        const sales = allOrders.filter(o => o.status === 'completado');
 
         // Calcular totales temporales (Hoy, Semana, Mes)
         const now = new Date();
@@ -485,11 +488,12 @@
         navigateTo('registrar-productos');
     };
 
-    function initRegistrarProductos() {
+    async function initRegistrarProductos() {
         const form = document.getElementById('formRegistroProducto');
         if (!form) return;
 
-        let currentImageBase64 = 'assets/caja-herramientas.jpeg'; // Imagen por defecto
+        let selectedFile = null;
+        let currentImageUrl = 'assets/caja-herramientas.jpeg'; // Default
         let isEditing = false;
 
         // Referencias a UI de imagen
@@ -501,7 +505,7 @@
 
         // Lógica de llenado si estamos en modo Edición
         if (window.productToEdit) {
-            const product = window.Store.getProductById(window.productToEdit);
+            const product = await window.Store.getProductById(window.productToEdit);
             if (product) {
                 isEditing = true;
                 document.getElementById('prodNombre').value = product.nombre;
@@ -513,9 +517,9 @@
                 document.getElementById('prodDescripcion').value = product.descripcion || '';
                 
                 if (product.imagen) {
-                    currentImageBase64 = product.imagen;
+                    currentImageUrl = product.imagen;
                     if (imgPreview && previewContainer && uploadArea) {
-                        imgPreview.src = product.imagen.startsWith('data:') ? product.imagen : `../${product.imagen}`;
+                        imgPreview.src = product.imagen.startsWith('http') ? product.imagen : `../${product.imagen}`;
                         previewContainer.style.display = 'block';
                         uploadArea.style.display = 'none';
                     }
@@ -529,34 +533,54 @@
             }
         }
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
+            const btnSubmit = form.querySelector('button[type="submit"]');
+            const originalBtnHtml = btnSubmit.innerHTML;
+            
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<i data-lucide="loader" class="spin"></i> Procesando...';
+            lucide.createIcons();
 
-            // Recolectar datos
-            const formData = {
-                nombre: document.getElementById('prodNombre').value,
-                marca: document.getElementById('prodMarca').value,
-                categoria: document.getElementById('prodCategoria').value,
-                sku: document.getElementById('prodSKU').value,
-                precio: document.getElementById('prodPrecio').value,
-                stock: document.getElementById('prodCantidad').value,
-                descripcion: document.getElementById('prodDescripcion').value,
-                imagen: currentImageBase64 
-            };
-
-            if (window.Store) {
-                if (isEditing) {
-                    window.Store.updateProduct(window.productToEdit, formData);
-                    alert('¡Producto actualizado con éxito!');
-                    window.productToEdit = null;
-                } else {
-                    window.Store.addProduct(formData);
-                    alert('¡Producto registrado con éxito!');
+            try {
+                // 1. Subir imagen si hay una nueva seleccionada
+                let imageUrl = currentImageUrl;
+                if (selectedFile) {
+                    const uploadedUrl = await window.Store.uploadImage(selectedFile);
+                    if (uploadedUrl) imageUrl = uploadedUrl;
                 }
-                form.reset();
-                navigateTo('inventario');
-            } else {
-                alert('Error fatal: Store no encontrado.');
+
+                // 2. Recolectar datos
+                const formData = {
+                    nombre: document.getElementById('prodNombre').value,
+                    marca: document.getElementById('prodMarca').value,
+                    categoria: document.getElementById('prodCategoria').value,
+                    sku: document.getElementById('prodSKU').value,
+                    precio: document.getElementById('prodPrecio').value,
+                    stock: document.getElementById('prodCantidad').value,
+                    descripcion: document.getElementById('prodDescripcion').value,
+                    imagen: imageUrl 
+                };
+
+                if (window.Store) {
+                    if (isEditing) {
+                        await window.Store.updateProduct(window.productToEdit, formData);
+                        alert('¡Producto actualizado con éxito!');
+                        window.productToEdit = null;
+                    } else {
+                        await window.Store.addProduct(formData);
+                        alert('¡Producto registrado con éxito!');
+                    }
+                    form.reset();
+                    navigateTo('inventario');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error al guardar el producto.');
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = originalBtnHtml;
+                lucide.createIcons();
             }
         });
 
@@ -565,21 +589,21 @@
              window.productToEdit = null;
         });
 
-        // Configurar visualización de la foto local y conversión a Base64
+        // Configurar visualización de la foto local
         if (fileInput && imgPreview && previewContainer && removeBtn && uploadArea) {
             fileInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
-                    if (file.size > 5 * 1024 * 1024) {
-                        alert("La imagen es muy pesada. Máximo 5MB para el prototipo LS.");
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert("La imagen es muy pesada. Máximo 10MB.");
                         this.value = '';
                         return;
                     }
 
+                    selectedFile = file;
+                    
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        // Guardamos el string base64 que localStorage puede usar globalmente
-                        currentImageBase64 = e.target.result;
                         imgPreview.src = e.target.result;
                         previewContainer.style.display = 'block';
                         uploadArea.style.display = 'none';
@@ -591,7 +615,7 @@
             removeBtn.addEventListener('click', function() {
                 fileInput.value = '';
                 imgPreview.src = '';
-                currentImageBase64 = 'assets/caja-herramientas.jpeg'; // Volver al default
+                selectedFile = null;
                 previewContainer.style.display = 'none';
                 uploadArea.style.display = 'flex';
             });
@@ -786,13 +810,13 @@
     /**
      * Actualiza la información del usuario en el topbar
      */
-    function updateTopbarSession() {
+    async function updateTopbarSession() {
         if (!window.Store) return;
-        const user = window.Store.getCurrentUser();
+        const user = await window.Store.getCurrentUser();
         if (user && TOPBAR_USER_NAME) {
-            TOPBAR_USER_NAME.textContent = user.nombre || 'Admin';
+            TOPBAR_USER_NAME.textContent = user.full_name || 'Admin';
             if (TOPBAR_USER_AVATAR) {
-                TOPBAR_USER_AVATAR.textContent = (user.nombre || 'A').charAt(0).toUpperCase();
+                TOPBAR_USER_AVATAR.textContent = (user.full_name || 'A').charAt(0).toUpperCase();
             }
         }
     }
@@ -800,10 +824,10 @@
     /**
      * Actualiza el badge de notificaciones (pedidos pendientes)
      */
-    function updateNotificationBadge() {
+    async function updateNotificationBadge() {
         if (!window.Store) return;
-        const orders = window.Store.getOrders() || [];
-        const pendingCount = orders.filter(o => o.estado === 'pendiente').length;
+        const orders = await window.Store.getOrders() || [];
+        const pendingCount = orders.filter(o => o.status === 'pendiente').length;
         
         if (NOTIFICATION_BADGE) {
             NOTIFICATION_BADGE.textContent = pendingCount;
@@ -824,11 +848,11 @@
     }
 
     // --- LOGOUT ---
-    window.logoutAdmin = function(e) {
+    window.logoutAdmin = async function(e) {
         if (e) e.preventDefault();
         if (confirm('¿Estás seguro de que deseas cerrar la sesión administrativa?')) {
             if (window.Store) {
-                window.Store.logout();
+                await window.Store.logout();
                 window.location.href = 'login.html';
             }
         }
@@ -878,9 +902,26 @@
     // INICIALIZACIÓN
     // ===========================
 
-    function init() {
+    async function init() {
         try {
-            // Inicializar iconos de Lucide (sidebar + topbar)
+            // 1. Verificar Sesión y Rol (Seguridad de Base)
+            if (!window.Store) throw new Error('Store no inicializado');
+            
+            const user = await window.Store.getCurrentUser();
+            if (!user) {
+                console.warn('Acceso no autorizado: Sin sesión activa.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (user.role !== 'admin') {
+                console.warn('Acceso denegado: Se requiere rol de administrador.');
+                alert('No tienes permisos para acceder al panel administrativo.');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // 2. Inicializar UI
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
@@ -890,13 +931,13 @@
             setInterval(updateDateTime, 1000);
 
             // Actualizar sesión y notificaciones
-            updateTopbarSession();
-            updateNotificationBadge();
+            await updateTopbarSession();
+            await updateNotificationBadge();
 
             // Cargar vista inicial según el hash de la URL
             const initialView = getViewFromHash();
             setActiveLink(initialView);
-            loadView(initialView);
+            await loadView(initialView);
         } catch (error) {
             console.error('Error durante la inicialización del Dashboard:', error);
             showLoading(false); // Forzar ocultación del spinner si algo falla

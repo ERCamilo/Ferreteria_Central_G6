@@ -24,13 +24,20 @@ document.addEventListener("DOMContentLoaded", function() {
     // RENDERIZADO DE PRODUCTOS
     // ===========================
 
-    function renderProducts() {
-        if (!productGrid) return; // Solo ejecutar en index.html o donde exista el grid
+    async function renderProducts() {
+        if (!productGrid) return; 
         
-        const products = Store.getProducts();
+        // Mostrar loader inicial si el grid está vacío
+        if (productGrid.innerHTML === '') {
+            productGrid.innerHTML = '<div class="loader-container"><i data-lucide="loader" class="spin"></i> Cargando productos...</div>';
+            lucide.createIcons();
+        }
+
+        const products = await Store.getProducts();
         const cart = Store.getCart();
 
         let html = '';
+        // ... (resto de la lógica igual, pero con los datos de Supabase)
 
         products.forEach(product => {
             // Check if product is in cart
