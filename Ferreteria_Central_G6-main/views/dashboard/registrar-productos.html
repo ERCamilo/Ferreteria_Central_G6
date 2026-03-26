@@ -1,0 +1,95 @@
+<!-- Vista: Registrar Productos -->
+<!-- Este archivo es cargado dinámicamente por dashboard.js -->
+
+<section class="dash-section">
+    <div class="section-header">
+        <div></div>
+        <a href="#inventario" class="btn-outline btn-sm">
+            <i data-lucide="arrow-left"></i>
+            Volver al Inventario
+        </a>
+    </div>
+</section>
+
+<!-- PRODUCT FORM -->
+<section class="form-section">
+    <form class="form-card" id="formRegistroProducto">
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="prodNombre">Nombre del Producto</label>
+                <input type="text" id="prodNombre" name="nombre" placeholder="Ej: Taladro Industrial 750W" required>
+            </div>
+            <div class="form-group">
+                <label for="prodMarca">Marca</label>
+                <input type="text" id="prodMarca" name="marca" placeholder="Ej: DeWalt" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="prodCategoria">Categoría</label>
+                <select id="prodCategoria" name="categoria" required>
+                    <option value="">Seleccionar categoría</option>
+                    <option value="herramientas">Herramientas</option>
+                    <option value="materiales">Materiales de Construcción</option>
+                    <option value="equipos">Equipos</option>
+                    <option value="electricidad">Electricidad</option>
+                    <option value="plomeria">Plomería</option>
+                    <option value="pintura">Pintura</option>
+                    <option value="seguridad">Seguridad Industrial</option>
+                    <option value="jardineria">Jardinería</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prodSKU">Código SKU</label>
+                <input type="text" id="prodSKU" name="sku" placeholder="Ej: SKU-001234">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="prodPrecio">Precio (RD$)</label>
+                <input type="number" id="prodPrecio" name="precio" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+                <label for="prodCantidad">Cantidad en Stock</label>
+                <input type="number" id="prodCantidad" name="cantidad" min="0" placeholder="0" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="prodDescripcion">Descripción</label>
+            <textarea id="prodDescripcion" name="descripcion" rows="4"
+                placeholder="Describe el producto, características principales..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="prodFoto">Foto del Producto</label>
+            <div class="file-upload" id="fileUploadArea">
+                <i data-lucide="upload-cloud"></i>
+                <p>Arrastra una imagen aquí o <strong>haz clic para seleccionar</strong></p>
+                <small>PNG, JPG o WebP (máx. 5MB)</small>
+                <input type="file" id="prodFoto" name="foto" accept="image/*" class="file-input">
+            </div>
+            <div class="image-preview" id="imagePreview" style="display: none;">
+                <img id="previewImg" src="" alt="Vista previa">
+                <button type="button" class="preview-remove" id="removePreview">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="reset" class="btn-outline">
+                <i data-lucide="rotate-ccw"></i>
+                Limpiar
+            </button>
+            <button type="submit" class="btn-primary">
+                <i data-lucide="save"></i>
+                Registrar Producto
+            </button>
+        </div>
+
+    </form>
+</section>

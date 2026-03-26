@@ -1,0 +1,194 @@
+<!-- Vista: Inicio / Dashboard Overview -->
+<!-- Este archivo es cargado dinámicamente por dashboard.js -->
+
+<!-- STAT CARDS -->
+<section class="stat-cards">
+    <article class="stat-card stat-card--sales">
+        <div class="stat-card__header">
+            <span class="stat-card__label">VENTAS NETAS</span>
+            <i data-lucide="trending-up"></i>
+        </div>
+        <p class="stat-card__value">$27,450</p>
+        <span class="stat-card__change positive">+ 5% vs semana pasada</span>
+    </article>
+
+    <article class="stat-card stat-card--orders">
+        <div class="stat-card__header">
+            <span class="stat-card__label">PEDIDOS</span>
+            <i data-lucide="shopping-bag"></i>
+        </div>
+        <p class="stat-card__value">1,284</p>
+        <span class="stat-card__change positive">+ 3.2% vs mes pasado</span>
+    </article>
+
+    <article class="stat-card stat-card--customers">
+        <div class="stat-card__header">
+            <span class="stat-card__label">CLIENTES</span>
+            <i data-lucide="users"></i>
+        </div>
+        <p class="stat-card__value">842</p>
+        <span class="stat-card__change positive">+ 12% vs mes pasado</span>
+    </article>
+
+    <article class="stat-card stat-card--growth">
+        <div class="stat-card__header">
+            <span class="stat-card__label">CRECIMIENTO</span>
+            <i data-lucide="bar-chart-3"></i>
+        </div>
+        <p class="stat-card__value">18.2%</p>
+        <span class="stat-card__change negative">- 2.1% vs semana pasada</span>
+    </article>
+</section>
+
+<!-- CHARTS ROW -->
+<section class="dash-grid-row">
+    <!-- Sales Overview -->
+    <article class="dash-panel dash-panel--large">
+        <div class="panel-header">
+            <h3>Resumen de Ventas</h3>
+            <div class="panel-legend">
+                <span class="legend-item">
+                    <span class="legend-dot legend-dot--current"></span>
+                    $69,524 <small>(Esta semana)</small>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot legend-dot--previous"></span>
+                    $58,254 <small>(Semana anterior)</small>
+                </span>
+            </div>
+            <button class="panel-btn">Esta Semana</button>
+        </div>
+        <div class="chart-placeholder chart-placeholder--lines">
+            <div class="chart-placeholder-content">
+                <i data-lucide="line-chart"></i>
+                <p>Gráfico de ventas</p>
+                <small>Se implementará con Chart.js</small>
+            </div>
+        </div>
+    </article>
+
+    <!-- Categories Donut -->
+    <article class="dash-panel dash-panel--small">
+        <div class="panel-header">
+            <h3>Categorías</h3>
+            <button class="panel-btn">Esta Semana</button>
+        </div>
+        <div class="chart-placeholder chart-placeholder--donut">
+            <div class="donut-ring">
+                <div class="donut-center">
+                    <span class="donut-percent">42%</span>
+                </div>
+            </div>
+        </div>
+        <div class="category-stats">
+            <div class="cat-stat">
+                <p class="cat-stat__value">5,230</p>
+                <span class="cat-stat__label">Herramientas</span>
+            </div>
+            <div class="cat-stat">
+                <p class="cat-stat__value">3,120</p>
+                <span class="cat-stat__label">Materiales</span>
+            </div>
+            <div class="cat-stat">
+                <p class="cat-stat__value">1,890</p>
+                <span class="cat-stat__label">Equipos</span>
+            </div>
+        </div>
+    </article>
+</section>
+
+<!-- BOTTOM ROW -->
+<section class="dash-grid-row">
+    <!-- Top Selling Products -->
+    <article class="dash-panel dash-panel--large">
+        <div class="panel-header">
+            <h3>Productos Más Vendidos</h3>
+            <button class="panel-btn">Esta Semana</button>
+        </div>
+        <div class="table-wrapper">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Fecha</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Código</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="product-cell">
+                            <span class="product-icon product-icon--tool">🔧</span>
+                            Taladro Industrial
+                        </td>
+                        <td>03 Mar</td>
+                        <td>$4,500</td>
+                        <td>127</td>
+                        <td>SKU-001234</td>
+                    </tr>
+                    <tr>
+                        <td class="product-cell">
+                            <span class="product-icon product-icon--material">🧱</span>
+                            Cemento Portland 50kg
+                        </td>
+                        <td>02 Mar</td>
+                        <td>$350</td>
+                        <td>890</td>
+                        <td>SKU-005678</td>
+                    </tr>
+                    <tr>
+                        <td class="product-cell">
+                            <span class="product-icon product-icon--equip">⚡</span>
+                            Compresor de Aire
+                        </td>
+                        <td>01 Mar</td>
+                        <td>$8,900</td>
+                        <td>45</td>
+                        <td>SKU-009012</td>
+                    </tr>
+                    <tr>
+                        <td class="product-cell">
+                            <span class="product-icon product-icon--tool">🪛</span>
+                            Destornillador Phillips
+                        </td>
+                        <td>28 Feb</td>
+                        <td>$180</td>
+                        <td>1,540</td>
+                        <td>SKU-003456</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <!-- Customers Bar Chart -->
+    <article class="dash-panel dash-panel--small">
+        <div class="panel-header">
+            <h3>Clientes</h3>
+            <button class="panel-btn">Este Mes</button>
+        </div>
+        <div class="bar-chart-placeholder">
+            <div class="bar-group">
+                <div class="bar" style="height: 50%;" data-label="Ene">
+                    <span class="bar-value">120</span>
+                </div>
+                <div class="bar" style="height: 65%;" data-label="Feb">
+                    <span class="bar-value">156</span>
+                </div>
+                <div class="bar bar--highlight" style="height: 80%;" data-label="Mar">
+                    <span class="bar-value">192</span>
+                </div>
+                <div class="bar" style="height: 45%;" data-label="Abr">
+                    <span class="bar-value">108</span>
+                </div>
+                <div class="bar" style="height: 70%;" data-label="May">
+                    <span class="bar-value">168</span>
+                </div>
+                <div class="bar" style="height: 90%;" data-label="Jun">
+                    <span class="bar-value">216</span>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>

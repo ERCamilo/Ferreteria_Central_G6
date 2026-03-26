@@ -1,0 +1,811 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", -apple-system, sans-serif;
+}
+
+:root {
+    --primary: #0b1838;
+    --primary-light: #122350;
+    --primary-hover: #0d1f4a;
+    --accent: #F68121;
+    --accent-hover: #e5741d;
+    --accent-soft: rgba(246, 129, 33, 0.1);
+    --bg: #f2f3f7;
+    --white: #ffffff;
+    --text: #1a1a1a;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.25s ease;
+}
+
+/* --- Dashboard Body --- */
+.dashboard-body {
+    background: var(--bg);
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+}
+
+/* ========================
+   SIDEBAR
+   ======================== */
+.sidebar {
+    width: 240px;
+    background: var(--primary);
+    color: white;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+    border-radius: 0 20px 20px 0;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 36px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+}
+
+.sidebar-logo {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.sidebar-nav a:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-nav a.active {
+    color: white;
+    background: var(--accent);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(246, 129, 33, 0.35);
+}
+
+.sidebar-nav a i,
+.sidebar-nav a svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-help {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: var(--transition);
+}
+
+.sidebar-help:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent) !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+     
+}
+
+.sidebar-logout:hover {
+    background: rgba(246, 129, 33, 0.1);
+}
+
+.sidebar-help i,
+.sidebar-help svg,
+.sidebar-logout i,
+.sidebar-logout svg {
+    width: 18px;
+    height: 18px;
+}
+/* CONTENEDOR */
+section {
+  width: 85%;
+  max-width: 800px;
+  margin: 40px auto;
+  background: orangered;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0.2);
+}
+
+/* TITULOS */
+h3 {
+  margin-bottom: 2px;
+  color: #333;
+  font-size: 18px;
+}
+
+/* LINEAS */
+hr {
+  border: none;
+  height: 1px;
+  background: #ddd;
+  margin-bottom: 15px;
+}
+
+/* FORM GRID */
+form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+/* BLOQUES */
+.informacion,
+.comercial,
+.Direccion {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* LABELS */
+label {
+  font-size: 14px;
+  color: #ffff;
+  font-weight: 500;
+}
+
+/* INPUTS Y SELECT */
+input,
+select {
+  width: 100%;
+  max-width: 280px; /* controla el tamaño */
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+/* EFECTO FOCUS */
+input:focus,
+select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0,123,255,0.3);
+}
+
+/* PLACEHOLDER */
+input::placeholder {
+  color: #aaa;
+}
+
+
+
+
+/* BOTON (si agregas uno luego) */
+button {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  max-width: 200px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*section {
+    background-color: cornflowerblue;
+    position:relative;
+    top:-543px;
+    width:890px;
+    right:-320px;
+    
+}
+
+ form {
+    background-color: aqua;
+    height:560px;
+    width: 750px;
+    margin-left: 12px; 
+ }
+
+ .nombre{
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif ;
+    font-weight: 600;
+    color:white;
+    position: relative ; 
+    right:-30px;
+    top:40px;
+    font-size: 18px;
+
+}
+
+.nombres {
+    position: relative ;
+    top:70px; 
+    left:-60px;
+    border-radius: 7px;
+    width:170px;
+    height:35px;
+}
+
+.Apellido{
+    position: relative;
+    top:10px;
+    right:50px;
+    font-size: 18px;
+    font-weight: 500;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color:white;
+}
+
+.Apellidos{
+    position:relative;
+    top:70px;
+    right: 30px;
+    width: 170px;
+    height:35px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border-radius: 7px;
+}
+
+ .Telefono{
+    position: relative;
+    top:100px;
+    right:95px;
+    font-weight: 500;
+    color:white;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    
+ }
+
+ .Telefonos{
+    position:relative;
+    top:130px;
+    right:200px;
+    width:200px;
+    height:30px;
+    border-radius:7px;
+ }
+
+.direccion {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color:white ; 
+    font-weight: 600;
+    font-size: 25px;
+    position: relative;
+    top:200px;
+    margin:20px;
+}
+
+.Provincia{
+    position: relative; 
+    top:180px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    color:white;
+    margin:20px;
+}
+
+.Provincias {
+    position: relative;
+    top:210px;
+    right:100px;
+    border-radius: 7px;
+    width:150px;
+    height: 30px;
+}
+
+.direcciones {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    font-weight:500;
+    color:white;
+    position: relative;
+    top:180px;
+    left: 100px;
+}
+
+.direccioness {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    width: 150px;
+    height: 30px;
+    position: relative;
+    border-radius: 7px;
+    top:210px;
+    right:10px;
+}
+ .comercial {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color:white ; 
+    font-weight: 600;
+    font-size: 25px;
+    position: relative;
+    top:160px;
+    margin:20px;
+ }
+ 
+ .cliente{
+  position:relative; 
+  top:160px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size:18px;
+  font-weight: 500;
+  color:white;
+  left:20px;
+}
+
+.clientes{
+    position: relative;
+    top:190px;
+    right:120px;
+    width:150px;
+    height:30px;
+    border-radius:7px;
+}
+
+.limite{
+    position:relative;
+    top:160px;
+    right:50px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    color:white;
+    font-weight: 500;
+
+}
+
+.limites{
+  position:relative;
+  top:190px;
+  right:210px;
+  width:150px;
+  height:30px;
+  border-radius:7px;
+
+}
+ .Estado{
+    position:relative;
+    top:160px;
+    right:140px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color:white;
+}
+
+.Estados{
+    position:relative;
+    top: 160px;
+    left:470px;
+    width:140px;
+    height: 30px;
+    border-radius:7px;
+}
+
+
+
+.Correo{
+  position:relative;
+  top:100px;
+  right:80px;
+  font-weight:500;
+  font-size: 18px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color:white;
+} 
+
+.correos{
+    position: relative;
+    top:100px;
+    right:-310px;
+    width: 190px;
+    height: 30px;
+    border-radius: 7px;
+}
+
+.Tipo{
+    position:relative;
+    top:130px;
+    left:40px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida   Sans Unicode', Geneva, Verdana, sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    color: white;
+}
+
+.Tipos{
+    position:relative;
+    top:130px;
+    left:560px;
+    width:130px;
+    height:30px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border-radius: 7px;
+}
+
+.linea{
+    position:relative;
+    top:100px;
+}
+
+.lineas {
+  position: relative;
+  top:40px;    
+}
+
+.informacion {
+    position: relative;
+    top:30px;
+    right:-40px;
+
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ========================
+   SIDEBAR
+   ======================== */
+/*.sidebar {
+    width: 240px;
+    background: var(--primary);
+    color: white;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+    border-radius: 0 20px 20px 0;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 36px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+}
+
+.sidebar-logo {
+    width: 42px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.sidebar-nav a:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-nav a.active {
+    color: white;
+    background: var(--accent);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(246, 129, 33, 0.35);
+}
+
+.sidebar-nav a i,
+.sidebar-nav a svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-help {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: var(--transition);
+}
+
+.sidebar-help:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent) !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.sidebar-logout:hover {
+    background: rgba(246, 129, 33, 0.1);
+}
+
+.sidebar-help i,
+.sidebar-help svg,
+.sidebar-logout i,
+.sidebar-logout svg {
+    width: 18px;
+    height: 18px;
+}

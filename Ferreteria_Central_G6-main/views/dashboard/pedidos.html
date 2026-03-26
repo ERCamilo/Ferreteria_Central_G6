@@ -1,0 +1,188 @@
+<!-- Vista: Pedidos -->
+<!-- Este archivo es cargado dinámicamente por dashboard.js -->
+
+<section class="dash-section">
+    <div class="section-header">
+        <div></div>
+        <div class="section-actions">
+            <button class="btn-outline btn-sm">
+                <i data-lucide="download"></i>
+                Exportar
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- STATS MINI -->
+<section class="mini-stats">
+    <div class="mini-stat">
+        <div class="mini-stat__icon mini-stat__icon--pending">
+            <i data-lucide="clock"></i>
+        </div>
+        <div>
+            <p class="mini-stat__value">23</p>
+            <span class="mini-stat__label">Pendientes</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat__icon mini-stat__icon--processing">
+            <i data-lucide="loader"></i>
+        </div>
+        <div>
+            <p class="mini-stat__value">12</p>
+            <span class="mini-stat__label">En Proceso</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat__icon mini-stat__icon--completed">
+            <i data-lucide="check-circle"></i>
+        </div>
+        <div>
+            <p class="mini-stat__value">1,249</p>
+            <span class="mini-stat__label">Completados</span>
+        </div>
+    </div>
+    <div class="mini-stat">
+        <div class="mini-stat__icon mini-stat__icon--pickup">
+            <i data-lucide="store"></i>
+        </div>
+        <div>
+            <p class="mini-stat__value">8</p>
+            <span class="mini-stat__label">Listos para Recoger</span>
+        </div>
+    </div>
+</section>
+
+<!-- FILTERS -->
+<section class="filters-bar">
+    <div class="filter-search">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="Buscar pedido o cliente..." id="searchPedidos">
+    </div>
+    <select class="filter-select" id="filterEstado">
+        <option value="">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="procesando">En Proceso</option>
+        <option value="completado">Completado</option>
+        <option value="cancelado">Cancelado</option>
+    </select>
+    <select class="filter-select" id="filterEntrega">
+        <option value="">Tipo de entrega</option>
+        <option value="envio">Envío a domicilio</option>
+        <option value="recogida">Recogida en tienda</option>
+    </select>
+</section>
+
+<!-- ORDERS TABLE -->
+<section class="dash-panel">
+    <div class="table-wrapper">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th># Orden</th>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Entrega</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>#ORD-2841</strong></td>
+                    <td>Carlos Méndez</td>
+                    <td>03 Mar 2026</td>
+                    <td>$12,350</td>
+                    <td>
+                        <span class="delivery-type delivery-type--shipping">
+                            <i data-lucide="truck"></i> Envío
+                        </span>
+                    </td>
+                    <td><span class="badge badge--warning">Pendiente</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>#ORD-2840</strong></td>
+                    <td>Ana Martínez</td>
+                    <td>03 Mar 2026</td>
+                    <td>$4,500</td>
+                    <td>
+                        <span class="delivery-type delivery-type--pickup">
+                            <i data-lucide="store"></i> Recogida
+                        </span>
+                    </td>
+                    <td><span class="badge badge--info">En Proceso</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>#ORD-2839</strong></td>
+                    <td>José Ramírez</td>
+                    <td>02 Mar 2026</td>
+                    <td>$890</td>
+                    <td>
+                        <span class="delivery-type delivery-type--shipping">
+                            <i data-lucide="truck"></i> Envío
+                        </span>
+                    </td>
+                    <td><span class="badge badge--success">Completado</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>#ORD-2838</strong></td>
+                    <td>María Santos</td>
+                    <td>02 Mar 2026</td>
+                    <td>$15,200</td>
+                    <td>
+                        <span class="delivery-type delivery-type--pickup">
+                            <i data-lucide="store"></i> Recogida
+                        </span>
+                    </td>
+                    <td><span class="badge badge--success">Completado</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>#ORD-2837</strong></td>
+                    <td>Pedro López</td>
+                    <td>01 Mar 2026</td>
+                    <td>$2,100</td>
+                    <td>
+                        <span class="delivery-type delivery-type--shipping">
+                            <i data-lucide="truck"></i> Envío
+                        </span>
+                    </td>
+                    <td><span class="badge badge--danger">Cancelado</span></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Editar"><i data-lucide="edit-2"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-pagination">
+        <span class="pagination-info">Mostrando 1-5 de 1,284 pedidos</span>
+        <div class="pagination-controls">
+            <button class="pagination-btn" disabled>&laquo;</button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span class="pagination-dots">...</span>
+            <button class="pagination-btn">257</button>
+            <button class="pagination-btn">&raquo;</button>
+        </div>
+    </div>
+</section>

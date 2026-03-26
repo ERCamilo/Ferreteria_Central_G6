@@ -1,0 +1,267 @@
+*{
+    font-family: 'Segoe UI', sans-serif;
+    margin:0;
+    padding: 0;     
+    box-sizing: border-box;
+}
+
+
+.logo-home{
+
+width: 300px;
+}
+
+.perfil-container{
+    display:flex;
+    justify-content:center;
+    margin-top:0px;
+}
+
+.perfil-card{
+    display:block;
+    background:white;
+    padding:30px;
+    width:400px;
+    text-align:center;
+    border-radius:10px;
+    box-shadow:0px 0px 10px rgba(0,0,0,0.2);
+margin: 25px;
+
+  
+}
+
+
+
+.perfil-foto img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+}
+
+.btn-editar{
+    margin-top:15px;
+    padding:10px 20px;
+    border:none;
+    background:#e5741d;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
+}
+
+.btn-editar:hover{
+    background:#0b1838;
+}
+
+.pedidos{
+    width:40%;
+    margin:30px auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th, td{
+    padding:12px;
+    border:1px solid #ccc;
+    text-align:center;
+}
+
+th{
+    background:#0b1838;
+    color:white;
+}
+
+.perfil{
+    position: relative;
+    width: 150px;
+}
+
+.foto-perfil{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+
+.icono-cambiar{
+    position: absolute;
+   bottom:280px;
+    right: 740px;
+
+    background: #2c3e50;
+    color: white;
+
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+  .sidebar {
+    width: 260px;
+    background: #0b1838;
+    height: 100vh;
+    padding: 20px 15px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+    border-radius: 0 20px 20px 0;
+    }
+
+        
+
+    .menu {
+        list-style: none;
+        flex: 1;
+    }
+
+    .menu li {
+        margin-bottom: 8px;
+    }
+
+    .menu a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 14px 20px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 15px;
+        border-radius: 12px;
+        transition: all 0.3s;
+    }
+
+    .menu a:hover {
+        background: #1e2937;
+        color: white;
+    }
+
+    .menu .active {
+        background: #f97316 !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+    }
+
+    .cerrar-sesion {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(250, 250, 250, 0.1);
+}
+
+
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent) !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.csletra{
+    color: #f97316;
+}
+.sidebar-logout:hover {
+    background: rgba(246, 129, 33, 0.1);
+}
+
+.sidebar-help i,
+.sidebar-help svg,
+.sidebar-logout i,
+.sidebar-logout svg {
+    width: 18px;
+    height: 18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.sidebar-logout {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent) !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.sidebar-logout:hover {
+    background: rgba(246, 129, 33, 0.1);
+}
+.header-bar{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+     
+  .logosidebar{
+    width: 100px;     /* Define el ancho (puedes usar px o %) */
+    height: auto;     /* ¡IMPORTANTE! Esto mantiene la proporción y no deforma la imagen */
+    display: block;
+  }
+       
+     
+.titulo-sidebar {
+    font-size: 0.9rem; /* Tamaño de letra (rem es mejor que px para accesibilidad) */
+    color: #fcfcfc;    /* El color (puedes usar nombres como 'orange' o códigos Hex) */
+    margin-top: 10px;  /* Espacio entre el logo y el texto */
+    font-family: Arial, sans-serif; 
+}
+       
+       
+      
+      
+
+     
+      
+       
+
+        

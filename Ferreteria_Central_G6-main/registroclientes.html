@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro cliente</title>
+    <link rel="stylesheet" href="/Ferreteria_Central_G6-main/css/registroclientes .css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo.png" class="sidebar-logo" alt="Logo">
+                <span>FERRETERÍA CENTRAL</span>
+            </div>
+
+            <nav class="sidebar-nav" id="sidebarNav">
+                <a href="#inicio" data-view="inicio" class="active">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#inventario" data-view="inventario">
+                    <i data-lucide="package"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#pedidos" data-view="pedidos">
+                    <i data-lucide="shopping-cart"></i>
+                    <span>Pedidos</span>
+                </a>
+                <a href="#ventas" data-view="ventas">
+                    <i data-lucide="trending-up"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="#clientes" data-view="clientes">
+                    <i data-lucide="users"></i>
+                    <span>Clientes</span>
+                </a>
+                <a href="#registrar-productos" data-view="registrar-productos">
+                    <i data-lucide="plus-circle"></i>
+
+                 <span>Registrar Productos</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="index.html" class="sidebar-logout">
+                  <i class="fa-duotone fa-solid fa-arrow-right-from-bracket"> 
+                    <span>Cerrar Sesión</span>
+                     </i>
+                </a>
+            </div>
+        </aside>
+
+    <section>
+        <div class="informacion">  
+              <h3>Informacion Personal</h3>
+                 <form action="">
+               <hr>
+                <label for="">Nombre</label>
+                <input type="text">
+                <label for="">Apellido</label>
+                <input type="text" name="" id="">
+                <label for="">Tipo de Documento</label>
+                <select name="" id="" class="Tipos">
+                   <option value="">Cedula</option>
+                   <option value="">Pasaporte</option>
+                   <option value="">RNC</option>
+                </select>
+               <label for="">Telefono</label>
+               <input type="number" placeholder="(809)587-6232">
+               <label for="">Correo electronico</label>
+               <input type="text">  
+           </div>
+            <div class="comercial"> 
+               <h3>Informacion Comercial</h3> 
+                <hr class="linea">
+                <label for="">Tipo de cliente</label>
+                <select name="" id=""> 
+                  <option value=""> Cliente minorista</option>
+                  <option value=""> Maestro Construccion</option>
+                  <option value="">Empresa</option>
+                  <option value="">Contratista</option>
+               </select>
+               <label for="" >Limite de credito</label>
+               <input type="number" placeholder="50.000">
+                <label for=""> Estado del cliente</label>
+                <select name="" id="">
+                   <option value="">Activo</option>
+                   <option value="">Inactivo</option>
+               </select>
+             
+           </div>
+
+           <div class="Direccion">  
+              <h3>Direccion</h3>
+              <hr>
+               <label for="" >Provincia</label>
+               <select name="" id="">
+                 <option value="">Santiago</option>
+                 <option value="">Santo Domingo</option>
+                 <option value="">La vega</option>
+              </select>
+             <label for="" >Direccion</label>
+             <input type="text">
+           </div>  
+        </form> 
+     </section>    
+
+ </body>
+</html>
