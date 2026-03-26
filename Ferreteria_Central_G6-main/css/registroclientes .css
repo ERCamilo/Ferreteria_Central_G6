@@ -227,6 +227,7 @@ select:focus {
 /* PLACEHOLDER */
 input::placeholder {
   color: #aaa;
+  
 }
 
 
