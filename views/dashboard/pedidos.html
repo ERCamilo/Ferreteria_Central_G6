@@ -108,3 +108,18 @@
         </div>
     </div>
 </section>
+
+<!-- MODAL DETALLES DEL PEDIDO (ADMIN) -->
+<div id="adminOrderModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+    <div class="modal-content" style="background-color: #fff; border-radius: 12px; padding: 24px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin: 0 auto;">
+        <span class="close-modal" onclick="closeAdminOrderModal()" style="position: absolute; top: 16px; right: 20px; font-size: 24px; font-weight: bold; color: #9ca3af; cursor: pointer;">&times;</span>
+        <div class="modal-header">
+            <h3 style="margin-bottom: 6px; color: #0b1838;">Detalles del Pedido <span id="adminModalOrderId" style="color:#6b7280; font-size: 14px;"></span></h3>
+            <p id="adminModalOrderDate" style="color:#6b7280; font-size:13px; margin:0;"></p>
+            <p id="adminModalOrderClient" style="color:#6b7280; font-size:13px; margin:0;"></p>
+        </div>
+        <div class="modal-body" id="adminModalOrderBody" style="margin-top: 20px;">
+            <!-- Se llena mediante JS -->
+        </div>
+    </div>
+</div>

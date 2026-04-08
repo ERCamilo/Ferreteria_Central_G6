@@ -5,7 +5,7 @@
  * Renderiza dinámicamente los productos y maneja el carrito (estilo Uber-Eats)
  */
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     const productGrid = document.getElementById("productGrid");
     const cartCountHeader = document.querySelector(".cart-count");
@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // ===========================
 
     async function renderProducts() {
-        if (!productGrid) return; 
-        
+        if (!productGrid) return;
+
         // Mostrar loader inicial si el grid está vacío
         if (productGrid.innerHTML === '') {
             productGrid.innerHTML = '<div class="loader-container"><i data-lucide="loader" class="spin"></i> Cargando productos...</div>';
@@ -51,9 +51,9 @@ document.addEventListener("DOMContentLoaded", function() {
             if (product.categoria.includes('Almacenamiento')) badgeClass = 'badge--storage';
             if (product.categoria.includes('Medición')) badgeClass = 'badge--measure';
 
-            // Generar el botón de acción (Agregar vs Controles Uber-Eats)
+
             let actionHtml = '';
-            
+
             if (!inCart) {
                 // Estado 1: No está en el carrito
                 actionHtml = `
@@ -102,12 +102,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         productGrid.innerHTML = html;
-        
+
         // Re-inicializar iconos
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-        
+
         updateHeaderCartCount();
     }
 
@@ -115,12 +115,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // ACCIONES GLOBALES (Window Exp)
     // ===========================
 
-    window.appHandleAddToCart = function(productId) {
+    window.appHandleAddToCart = function (productId) {
         Store.addToCart(productId, 1);
         renderProducts(); // Re-render para mostrar los controles Uber-Eats
     };
 
-    window.appHandleUpdateQty = function(productId, delta) {
+    window.appHandleUpdateQty = function (productId, delta) {
         const cart = Store.getCart();
         const item = cart.find(i => i.productId === productId);
         if (item) {
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function() {
         renderProducts();
     };
 
-    window.appHandleRemove = function(productId) {
+    window.appHandleRemove = function (productId) {
         Store.removeFromCart(productId);
         renderProducts();
     };

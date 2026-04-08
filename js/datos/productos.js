@@ -88,13 +88,26 @@ window.ProductService = (function () {
      * Actualizar un producto
      */
     async function updateProduct(id, updates) {
-        // Mapear campos si es necesario
+        // Mapear campos del frontend a columnas de la DB
         const dbUpdates = {};
         if (updates.nombre) dbUpdates.name = updates.nombre;
         if (updates.descripcion) dbUpdates.description = updates.descripcion;
         if (updates.precio) dbUpdates.price = parseFloat(updates.precio);
         if (updates.stock !== undefined) dbUpdates.stock = parseInt(updates.stock);
         if (updates.imagen) dbUpdates.image_url = updates.imagen;
+
+        // Buscar category_id si se envió una categoría por nombre
+        if (updates.categoria) {
+            const { data: catData } = await supabase
+                .from('categories')
+                .select('id')
+                .eq('name', updates.categoria)
+                .single();
+            
+            if (catData) {
+                dbUpdates.category_id = catData.id;
+            }
+        }
 
         const { error } = await supabase
             .from('products')

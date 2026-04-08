@@ -45,6 +45,19 @@
         .auth-message { margin-bottom: 15px; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 500; text-align: center; }
         .auth-message.error { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; }
         .auth-message.success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background-color: #fff; border-radius: 12px; padding: 24px; width: 90%; max-width: 600px; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); margin: 0 auto;}
+        .close-modal { position: absolute; top: 16px; right: 20px; font-size: 24px; font-weight: bold; color: #9ca3af; cursor: pointer; transition: color 0.2s; }
+        .close-modal:hover { color: #374151; }
+        .modal-header h3 { margin-bottom: 6px; color: #0b1838; }
+        .modal-body { margin-top: 20px; }
+        .order-items-table { width: 100%; border-collapse: collapse; margin-top: 15px;}
+        .order-items-table th, .order-items-table td { text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb; border-top: none; border-left: none; border-right: none;}
+        .order-items-table th { background-color: #f9fafb; font-weight: 600; color: #4b5563; }
+        .modal-footer { margin-top: 20px; text-align: right; border-top: 1px solid #e5e7eb; padding-top: 15px; }
+        .order-total-large { font-size: 18px; font-weight: bold; color: #0b1838; }
     </style>
 </head>
 
@@ -164,6 +177,20 @@
         <button class="btn-security-save" onclick="updatePassword()">Actualizar Contraseña</button>
     </div>
 
+    <!-- MODAL DETALLES DEL PEDIDO -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeOrderModal()">&times;</span>
+            <div class="modal-header">
+                <h3>Detalles del Pedido <span id="modalOrderId" style="color:#6b7280; font-size: 14px;"></span></h3>
+                <p id="modalOrderDate" style="color:#6b7280; font-size:13px; margin:0;"></p>
+            </div>
+            <div class="modal-body" id="modalOrderBody">
+                <!-- Se llena mediante JS -->
+            </div>
+        </div>
+    </div>
+
 </main>
 
     <!-- SUPABASE SDK -->
@@ -199,7 +226,7 @@
         document.getElementById('editDireccion').value = session.address || '';
         document.getElementById('editTelefono').value = session.phone || '';
         
-        loadOrders();
+        await loadOrders();
     }
 
     function toggleEdit(isEditing) {
@@ -298,16 +325,27 @@
         }
     }
 
-    function loadOrders() {
-        const orders = Store.getOrdersByUser(session.id);
+    // Variable global para almacenar los pedidos y acceder a ellos desde el modal
+    let userOrders = [];
+
+    async function loadOrders() {
+        userOrders = await Store.getOrdersByUser(session.id);
         const container = document.getElementById('ordersContainer');
 
-        if (orders.length === 0) {
+        if (!userOrders || userOrders.length === 0) {
             container.innerHTML = '<div class="pedidos-empty">No has realizado ningún pedido aún.</div>';
             return;
         }
 
-        orders.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        userOrders.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        // Mapear estados de inglés (DB) a español (UI)
+        const statusMap = {
+            'pending': { label: 'PENDIENTE', css: 'pendiente' },
+            'processing': { label: 'PROCESANDO', css: 'pendiente' },
+            'completed': { label: 'COMPLETADO', css: 'completado' },
+            'cancelled': { label: 'CANCELADO', css: 'cancelado' }
+        };
 
         let tableStr = `
             <table>
@@ -320,19 +358,17 @@
                 </tr>
         `;
 
-        orders.forEach(order => {
+        userOrders.forEach(order => {
             const date = new Date(order.fecha).toLocaleDateString();
-            const badgeClass = order.estado === 'pendiente' ? 'pendiente' 
-                             : order.estado === 'completado' ? 'completado' 
-                             : 'cancelado';
+            const st = statusMap[order.estado] || { label: order.estado, css: 'pendiente' };
             
             tableStr += `
                 <tr>
-                    <td><strong>${order.id}</strong><br><small>${order.items.length} items</small></td>
+                    <td><strong>${order.id.substring(0, 8)}...</strong><br><small>${order.items.length} items</small></td>
                     <td>${date}</td>
-                    <td><span class="status-badge ${badgeClass}">${order.estado.toUpperCase()}</span></td>
+                    <td><span class="status-badge ${st.css}">${st.label}</span></td>
                     <td>$${order.total.toFixed(2)}</td>
-                    <td><button onclick="alert('Funcionalidad de ver detalle en desarrollo.')" style="padding:4px 8px;font-size:12px;background:#eee;border:1px solid #ccc;border-radius:4px;cursor:pointer;">Ver</button></td>
+                    <td><button onclick="viewOrder('${order.id}')" style="padding:4px 8px;font-size:12px;background:#0b1838;color:white;border:none;border-radius:4px;cursor:pointer;">Ver</button></td>
                 </tr>
             `;
         });
@@ -340,6 +376,81 @@
         tableStr += '</table>';
         container.innerHTML = tableStr;
     }
+
+    // Funciones del Modal
+    function viewOrder(orderId) {
+        const order = userOrders.find(o => o.id === orderId);
+        if(!order) return;
+
+        document.getElementById('modalOrderId').textContent = '#' + order.id.substring(0,8).toUpperCase();
+        document.getElementById('modalOrderDate').textContent = 'Fecha: ' + new Date(order.fecha).toLocaleString();
+
+        let itemsHtml = `
+            <table class="order-items-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        let orderSum = 0;
+        if(order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const pName = item.products ? item.products.name : 'Producto Desconocido';
+                const sub = item.quantity * item.unit_price;
+                orderSum += sub;
+                itemsHtml += `
+                    <tr>
+                        <td>${pName}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.unit_price.toFixed(2)}</td>
+                        <td>$${sub.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            itemsHtml += '<tr><td colspan="4" style="text-align:center;">No hay items.</td></tr>';
+        }
+
+        const deliveryCost = order.total - orderSum;
+        if(deliveryCost > 0) {
+             itemsHtml += `
+                 <tr>
+                     <td colspan="3" style="text-align:right;"><strong>Envío:</strong></td>
+                     <td><strong>$${deliveryCost.toFixed(2)}</strong></td>
+                 </tr>
+             `;
+        }
+
+        itemsHtml += `
+                </tbody>
+            </table>
+            <div class="modal-footer">
+                <span class="order-total-large">Total Pagado: $${order.total.toFixed(2)}</span>
+            </div>
+        `;
+
+        document.getElementById('modalOrderBody').innerHTML = itemsHtml;
+        const modal = document.getElementById('orderModal');
+        modal.style.display = 'flex';
+    }
+
+    function closeOrderModal() {
+        document.getElementById('orderModal').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic afuera
+    window.onclick = function(event) {
+        const modal = document.getElementById('orderModal');
+        if (event.target == modal) {
+            closeOrderModal();
+        }
+    };
 
     // Inicializar página
     (async function() {

@@ -103,7 +103,7 @@
             document.getElementById('registroFooter').style.display = role === 'admin' ? 'none' : 'block';
 
             if (role === 'admin') {
-                emailInput.value = 'admin@ferreteriacentral.com';
+                emailInput.value = 'admin@gmail.com';
                 passInput.value = 'admin123';
             } else {
                 emailInput.value = '';
@@ -140,8 +140,10 @@
             const result = await Store.login(email, password);
 
             if (result.success) {
+                // Mapear pestaña a rol real en DB
+                const expectedRole = currentRole === 'cliente' ? 'customer' : 'admin';
                 // Verificar que el rol coincide con la pestaña seleccionada
-                if (result.user.role !== currentRole) {
+                if (result.user.role !== expectedRole) {
                     showMessage('Credenciales válidas, pero el tipo de cuenta no coincide.', 'error');
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = originalBtnText;

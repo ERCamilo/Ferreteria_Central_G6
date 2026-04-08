@@ -68,12 +68,24 @@
 }
 
 /* Cart Layout */
-@media (min-width: 900px) {
+.cart-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (min-width: 768px) {
     .cart-layout {
-        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 28px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cart-layout {
         grid-template-columns: 1fr 360px;
         gap: 30px;
-        align-items: start;
     }
 }
 

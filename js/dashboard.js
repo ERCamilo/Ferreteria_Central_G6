@@ -251,6 +251,15 @@
         }
     }
 
+    // Estado global de paginación
+    window.dashboardPagination = {
+        inventario: 1,
+        pedidos: 1,
+        clientes: 1,
+        ventas: 1
+    };
+    const ITEMS_PER_PAGE = 8; // Elementos por página
+
     // --- INVENTARIO ---
     async function renderInventario() {
         const tbody = document.getElementById('inventoryTableBody');
@@ -260,14 +269,20 @@
         
         if (products.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay productos registrados en el inventario.</td></tr>';
+            renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'inventario');
             return;
         }
 
-        tbody.innerHTML = products.map(p => {
+        const page = window.dashboardPagination.inventario;
+        const totalItems = products.length;
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const paginatedProducts = products.slice(start, start + ITEMS_PER_PAGE);
+
+        tbody.innerHTML = paginatedProducts.map(p => {
             const stockStatus = p.stock > 10 ? 'success' : (p.stock > 0 ? 'warning' : 'danger');
             const stockText = p.stock > 10 ? 'Disponible' : (p.stock > 0 ? 'Stock Bajo' : 'Agotado');
             // Mock de imagen e icono según si existe
-            const imgHtml = p.imagen ? `<img src="${p.imagen.startsWith('data:') ? p.imagen : '../' + p.imagen}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin-right:10px;">` : `<span class="product-icon product-icon--tool">🔧</span>`;
+            const imgHtml = p.imagen ? `<img src="${p.imagen.startsWith('http') || p.imagen.startsWith('data:') ? p.imagen : '../' + p.imagen}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin-right:10px;">` : `<span class="product-icon product-icon--tool">🔧</span>`;
 
             return `
                 <tr>
@@ -290,6 +305,8 @@
             `;
         }).join('');
 
+        renderPaginationUI(totalItems, page, ITEMS_PER_PAGE, '.table-pagination', 'inventario');
+
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -301,12 +318,16 @@
         }
     };
 
+    // Variable global para almacenar pedidos y accederlos desde el modal
+    window.adminOrders = [];
+
     // --- PEDIDOS ---
     async function renderPedidos() {
         const tbody = document.getElementById('adminOrdersTableBody');
         if (!tbody || !window.Store) return;
 
-        const orders = await window.Store.getOrders();
+        window.adminOrders = await window.Store.getOrders();
+        const orders = window.adminOrders;
         
         // Actualizar mini-stats
         const pPendientes = orders.filter(o => o.status === 'pendiente').length;
@@ -321,13 +342,19 @@
 
         if (orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay órdenes registradas.</td></tr>';
+            renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'pedidos');
             return;
         }
 
         orders.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+        const page = window.dashboardPagination.pedidos;
+        const totalItems = orders.length;
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const paginatedOrders = orders.slice(start, start + ITEMS_PER_PAGE);
+
         let rows = '';
-        orders.forEach(order => {
+        paginatedOrders.forEach(order => {
             const date = new Date(order.fecha).toLocaleDateString();
             
             let clienteName = "Cliente";
@@ -358,13 +385,14 @@
                     </td>
                     <td><span class="badge badge--${badgeClass}">${estadoLabel}</span></td>
                     <td class="actions-cell">
-                        <button class="action-btn" title="Ver detalles"><i data-lucide="eye"></i></button>
+                        <button class="action-btn" title="Ver detalles" onclick="window.viewAdminOrder('${order.id}')"><i data-lucide="eye"></i></button>
                     </td>
                 </tr>
             `;
         });
 
         tbody.innerHTML = rows;
+        renderPaginationUI(totalItems, page, ITEMS_PER_PAGE, '.table-pagination', 'pedidos');
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -385,13 +413,19 @@
 
         if (clientes.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay clientes registrados.</td></tr>';
+            renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'clientes');
             return;
         }
 
         const orders = await window.Store.getOrders() || [];
 
+        const page = window.dashboardPagination.clientes;
+        const totalItems = clientes.length;
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const paginatedClientes = clientes.slice(start, start + ITEMS_PER_PAGE);
+
         let rows = '';
-        clientes.forEach(c => {
+        paginatedClientes.forEach(c => {
             // Filtrar órdenes de este cliente
             const userOrders = orders.filter(o => o.userId === c.id);
             const totalGasto = userOrders.filter(o => o.status === 'completado').reduce((sum, o) => sum + o.total, 0);
@@ -422,6 +456,7 @@
             `;
         });
         tbody.innerHTML = rows;
+        renderPaginationUI(totalItems, page, ITEMS_PER_PAGE, '.table-pagination', 'clientes');
     }
 
     // --- VENTAS ---
@@ -429,7 +464,8 @@
         const tbody = document.getElementById('adminVentasTableBody');
         if (!tbody || !window.Store) return;
 
-        const allOrders = await window.Store.getOrders();
+        window.adminOrders = await window.Store.getOrders();
+        const allOrders = window.adminOrders;
         const sales = allOrders.filter(o => o.status === 'completado');
 
         // Calcular totales temporales (Hoy, Semana, Mes)
@@ -451,13 +487,19 @@
 
         if (sales.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No hay ventas registradas.</td></tr>';
+            renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'ventas');
             return;
         }
 
         sales.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+        const page = window.dashboardPagination.ventas;
+        const totalItems = sales.length;
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const paginatedSales = sales.slice(start, start + ITEMS_PER_PAGE);
+
         let rows = '';
-        sales.forEach(order => {
+        paginatedSales.forEach(order => {
             const date = new Date(order.fecha).toLocaleDateString();
             let clienteName = "Cliente";
             if (order.userId) {
@@ -474,14 +516,105 @@
                     <td>${date}</td>
                     <td><span class="badge badge--info">${order.metodoPago || 'Tarjeta'}</span></td>
                     <td><strong>$${parseFloat(order.total || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                    <td class="actions-cell">
+                        <button class="action-btn" title="Ver detalles" onclick="window.viewAdminOrder('${order.id}')"><i data-lucide="eye"></i></button>
+                    </td>
                 </tr>
             `;
         });
         tbody.innerHTML = rows;
+        
+        renderPaginationUI(totalItems, page, ITEMS_PER_PAGE, '.table-pagination', 'ventas');
 
         // Renderizar gráfico de Ventas
         renderVentasCharts(sales);
     }
+
+    // --- MODAL DE DETALLE DE PEDIDOS (ADMIN) ---
+    window.viewAdminOrder = function(orderId) {
+        if (!window.adminOrders) return;
+        const order = window.adminOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        document.getElementById('adminModalOrderId').textContent = '#' + order.id.substring(0,8).toUpperCase();
+        document.getElementById('adminModalOrderDate').textContent = 'Fecha: ' + new Date(order.fecha).toLocaleString();
+        
+        let clienteName = "Cliente";
+        if (order.cliente) {
+            clienteName = order.cliente;
+        } else if (order.userId && window.Store) {
+            const user = window.Store.getUserById(order.userId);
+            if (user) clienteName = user.nombre;
+        }
+        document.getElementById('adminModalOrderClient').textContent = 'Cliente: ' + clienteName;
+
+        let itemsHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb;">Producto</th>
+                        <th style="text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb;">Cantidad</th>
+                        <th style="text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb;">Precio Unit.</th>
+                        <th style="text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        let orderSum = 0;
+        if(order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const pName = item.products ? item.products.name : 'Producto Desconocido';
+                const sub = item.quantity * item.unit_price;
+                orderSum += sub;
+                itemsHtml += `
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${pName}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${item.quantity}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">$${parseFloat(item.unit_price || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">$${sub.toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            itemsHtml += '<tr><td colspan="4" style="text-align:center; padding: 10px;">No hay items.</td></tr>';
+        }
+
+        const deliveryCost = order.total - orderSum;
+        if(deliveryCost > 0) {
+             itemsHtml += `
+                 <tr>
+                     <td colspan="3" style="text-align:right; padding: 10px;"><strong>Envío:</strong></td>
+                     <td style="padding: 10px;"><strong>$${deliveryCost.toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
+                 </tr>
+             `;
+        }
+
+        itemsHtml += `
+                </tbody>
+            </table>
+            <div style="margin-top: 20px; text-align: right; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+                <span style="font-size: 18px; font-weight: bold; color: #0b1838;">Total: $${parseFloat(order.total || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</span>
+            </div>
+        `;
+
+        document.getElementById('adminModalOrderBody').innerHTML = itemsHtml;
+        const modal = document.getElementById('adminOrderModal');
+        if(modal) modal.style.display = 'flex';
+    };
+
+    window.closeAdminOrderModal = function() {
+        const modal = document.getElementById('adminOrderModal');
+        if(modal) modal.style.display = 'none';
+    };
+
+    // Close admin modal on outside click
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('adminOrderModal');
+        if (event.target == modal) {
+            window.closeAdminOrderModal();
+        }
+    });
 
     window.editProductDashboard = function(id) {
         window.productToEdit = id;
@@ -495,6 +628,22 @@
         let selectedFile = null;
         let currentImageUrl = 'assets/caja-herramientas.jpeg'; // Default
         let isEditing = false;
+
+        // Cargar categorías dinámicamente desde la DB
+        const catSelect = document.getElementById('prodCategoria');
+        if (catSelect) {
+            const { data: categories } = await window.supabase
+                .from('categories')
+                .select('id, name')
+                .order('name');
+            
+            catSelect.innerHTML = '<option value="">Seleccionar categoría</option>';
+            if (categories) {
+                categories.forEach(c => {
+                    catSelect.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+                });
+            }
+        }
 
         // Referencias a UI de imagen
         const fileInput = document.getElementById('prodFoto');
@@ -797,8 +946,80 @@
     }
 
     // ===========================
-    // UI HELPERS
+    // UI HELPERS & PAGINATION
     // ===========================
+
+    window.goToPage = function(module, newPage) {
+        window.dashboardPagination[module] = newPage;
+        if (module === 'inventario') renderInventario();
+        if (module === 'pedidos') renderPedidos();
+        if (module === 'clientes') renderClientes();
+        if (module === 'ventas') renderVentas();
+    };
+
+    function renderPaginationUI(totalItems, currentPage, itemsPerPage, containerSelector, module) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        // Si solo hay 1 página (o cero), ocultamos la paginación por completo
+        if (totalPages <= 1) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
+        
+        const start = (currentPage - 1) * itemsPerPage + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        
+        const infoSpan = container.querySelector('.pagination-info');
+        if (infoSpan) infoSpan.textContent = `Mostrando ${start}-${end} de ${totalItems} resultados`;
+
+        const controlsDiv = container.querySelector('.pagination-controls');
+        if (!controlsDiv) return;
+
+        let html = '';
+
+        // Prev
+        if (currentPage === 1) {
+            html += `<button class="pagination-btn" disabled>&laquo;</button>`;
+        } else {
+            html += `<button class="pagination-btn" onclick="window.goToPage('${module}', ${currentPage - 1})">&laquo;</button>`;
+        }
+
+        // Logic for page numbers (show up to 5 buttons: 1, 2, ..., last)
+        let startPage = Math.max(1, currentPage - 1);
+        let endPage = Math.min(totalPages, currentPage + 1);
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" onclick="window.goToPage('${module}', 1)">1</button>`;
+            if (startPage > 2) html += `<span class="pagination-dots">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === currentPage) {
+                html += `<button class="pagination-btn active">${i}</button>`;
+            } else {
+                html += `<button class="pagination-btn" onclick="window.goToPage('${module}', ${i})">${i}</button>`;
+            }
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) html += `<span class="pagination-dots">...</span>`;
+            html += `<button class="pagination-btn" onclick="window.goToPage('${module}', ${totalPages})">${totalPages}</button>`;
+        }
+
+        // Next
+        if (currentPage === totalPages) {
+            html += `<button class="pagination-btn" disabled>&raquo;</button>`;
+        } else {
+            html += `<button class="pagination-btn" onclick="window.goToPage('${module}', ${currentPage + 1})">&raquo;</button>`;
+        }
+
+        controlsDiv.innerHTML = html;
+    }
 
     function showLoading(show) {
         if (LOADING_SPINNER) {

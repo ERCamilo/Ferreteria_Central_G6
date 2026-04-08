@@ -110,12 +110,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Actualizar nombre y carrito desde la sesión usando Store.js
     if (typeof Store !== 'undefined') {
-        const session = Store.getSession();
-        const accountLink = document.getElementById('headerAccount');
-        if (session && accountLink) {
-            accountLink.innerHTML = '<small>Hola, ' + session.nombre.split(' ')[0] + '</small><strong>Mi Cuenta <i data-lucide="chevron-down"></i></strong>';
-            accountLink.href = `${basePath}views/perfil.html`;
-        }
+        // getSession() es asíncrono (Supabase), por eso usamos .then()
+        Store.getSession().then(session => {
+            const accountLink = document.getElementById('headerAccount');
+            if (session && accountLink) {
+                const displayName = (session.full_name || session.email || 'Usuario').split(' ')[0];
+                accountLink.innerHTML = '<small>Hola, ' + displayName + '</small><strong>Mi Cuenta <i data-lucide="chevron-down"></i></strong>';
+                accountLink.href = `${basePath}views/perfil.html`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        });
         
         const cartCountHeader = document.getElementById('cartCountHeader');
         if (cartCountHeader) {

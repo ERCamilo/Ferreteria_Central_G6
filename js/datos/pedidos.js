@@ -72,7 +72,7 @@ window.OrderService = (function () {
                 .insert([{
                     user_id: session.user.id,
                     total_amount: orderData.total,
-                    status: 'pendiente',
+                    status: 'pending',
                     delivery_type: orderData.tipoEntrega || 'envio'
                 }])
                 .select()
