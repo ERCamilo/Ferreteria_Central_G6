@@ -715,3 +715,50 @@ body {
   width: 100%;
   height: 40px;
 }
+
+/* ================================
+   MOBILE RESPONSIVENESS
+   ================================ */
+
+@media (max-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .store-main {
+        padding: 10px;
+    }
+
+    .footer-main {
+        flex-direction: column;
+        gap: 24px;
+        text-align: center;
+    }
+
+    .checkout-layout {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .store-card__image {
+        height: 250px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}

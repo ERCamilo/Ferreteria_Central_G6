@@ -309,3 +309,38 @@
   color: var(--accent);
   font-weight: 600;
 }
+
+/* ================================
+   MOBILE RESPONSIVENESS
+   ================================ */
+
+@media (max-width: 768px) {
+  .header-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .header-search {
+    order: 3;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .header-logo-text {
+    display: none; /* Hide large logo text on tiny devices to save space */
+  }
+
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-promo {
+    display: none;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

@@ -152,7 +152,7 @@
 
         const orders = await window.Store.getOrders() || [];
         const products = await window.Store.getProducts() || [];
-        const ventasCompletadas = orders.filter(o => o.status === 'completado');
+        const ventasCompletadas = orders.filter(o => o.status === 'completed');
         const totalVentas = ventasCompletadas.reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
         const numeroPedidos = orders.length;
 
@@ -169,6 +169,13 @@
 
         const clientesEl = document.getElementById('inicioTotalClientes');
         if (clientesEl) clientesEl.textContent = numeroClientes;
+
+        // "Activos Hoy" (Clientes con interacción)
+        const activeUsersEl = document.getElementById('inicioActiveUsers');
+        if (activeUsersEl) {
+            const uniqueActiveClients = new Set(orders.map(o => o.userId)).size;
+            activeUsersEl.textContent = uniqueActiveClients;
+        }
 
         // --- CÁLCULO DE SEMANAS PARA LEYENDA ---
         const now = new Date();
@@ -228,10 +235,27 @@
             `).join('');
         }
 
-        // Top Products (simulado con los primeros 4 del inventario)
+        // Top Products (Calculado a partir del historial de ventas reales)
         const topProductsBody = document.getElementById('inicioTopProductsBody');
         if (topProductsBody) {
-            const topProducts = products.slice(0, 4);
+            // Contar frecuencia de ventas por producto
+            const productSalesCount = {};
+            ventasCompletadas.forEach(order => {
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        const pid = item.productId || item.id;
+                        productSalesCount[pid] = (productSalesCount[pid] || 0) + (item.cantidad || 1);
+                    });
+                }
+            });
+
+            // Enriquecer productos con sus ventas totales y ordenar
+            const sortedBySales = products.map(p => ({
+                ...p,
+                totalSold: productSalesCount[p.id] || 0
+            })).sort((a, b) => b.totalSold - a.totalSold);
+
+            const topProducts = sortedBySales.slice(0, 4);
             if (topProducts.length === 0) {
                 topProductsBody.innerHTML = '<tr><td colspan="5" class="text-center">No hay productos.</td></tr>';
             } else {
@@ -248,6 +272,48 @@
                     </tr>
                 `).join('');
             }
+
+        }
+
+        // --- Gráfico de Barras de Clientes (Historico 6 Meses) ---
+        const barGroup = document.querySelector('.bar-group');
+        if (barGroup && profiles) {
+            const mesesStr = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const history = [];
+            const d = new Date();
+            
+            // Generar los últimos 6 meses
+            for (let i = 5; i >= 0; i--) {
+                const past = new Date(d.getFullYear(), d.getMonth() - i, 1);
+                history.push({
+                    month: past.getMonth(),
+                    year: past.getFullYear(),
+                    label: mesesStr[past.getMonth()],
+                    count: 0
+                });
+            }
+
+            // Agrupar profiles
+            profiles.forEach(p => {
+                if (p.role !== 'admin' && p.created_at) {
+                    const cDate = new Date(p.created_at);
+                    const slot = history.find(h => h.month === cDate.getMonth() && h.year === cDate.getFullYear());
+                    if (slot) slot.count++;
+                }
+            });
+
+            // Si todos son 0 (e.g. data antigua o falta de history temporal), mostrar algunos simulados para display
+            const maxCount = Math.max(...history.map(h => h.count), 1); // Evitar divisón por 0
+
+            barGroup.innerHTML = history.map((h, i) => {
+                const heightPct = Math.max((h.count / maxCount) * 100, 10); // Min 10% para que se vea
+                const highlight = i === history.length -1 ? 'bar--highlight' : ''; // Mes actual resaltado
+                return `
+                    <div class="bar ${highlight}" style="height: ${heightPct}%;" data-label="${h.label}">
+                        <span class="bar-value">${h.count}</span>
+                    </div>
+                `;
+            }).join('');
         }
     }
 
@@ -265,10 +331,48 @@
         const tbody = document.getElementById('inventoryTableBody');
         if (!tbody) return;
 
-        const products = window.Store ? await window.Store.getProducts() : [];
-        
+        window.adminInventory = window.Store ? await window.Store.getProducts() : [];
+
+        const s = document.getElementById('searchInventario');
+        const fC = document.getElementById('filterCategoria');
+        const fS = document.getElementById('filterStock');
+
+        if (s && !s.dataset.bound) {
+            s.addEventListener('input', () => { window.dashboardPagination.inventario = 1; updateInventarioTable(); });
+            fC.addEventListener('change', () => { window.dashboardPagination.inventario = 1; updateInventarioTable(); });
+            fS.addEventListener('change', () => { window.dashboardPagination.inventario = 1; updateInventarioTable(); });
+            s.dataset.bound = 'true';
+        }
+
+        updateInventarioTable();
+    }
+
+    function updateInventarioTable() {
+        const tbody = document.getElementById('inventoryTableBody');
+        if (!tbody) return;
+
+        let products = window.adminInventory || [];
+
+        const s = document.getElementById('searchInventario')?.value.toLowerCase();
+        const fC = document.getElementById('filterCategoria')?.value;
+        const fS = document.getElementById('filterStock')?.value;
+
+        if (s || fC || fS) {
+            products = products.filter(p => {
+                let match = true;
+                if (s && !p.nombre.toLowerCase().includes(s)) match = false;
+                if (fC && p.categoria !== fC) match = false;
+                if (fS) {
+                    if (fS === 'alto' && p.stock <= 10) match = false;
+                    if (fS === 'bajo' && (p.stock > 10 || p.stock === 0)) match = false;
+                    if (fS === 'agotado' && p.stock > 0) match = false;
+                }
+                return match;
+            });
+        }
+
         if (products.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay productos registrados en el inventario.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No hay productos que coincidan con los filtros.</td></tr>';
             renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'inventario');
             return;
         }
@@ -281,7 +385,6 @@
         tbody.innerHTML = paginatedProducts.map(p => {
             const stockStatus = p.stock > 10 ? 'success' : (p.stock > 0 ? 'warning' : 'danger');
             const stockText = p.stock > 10 ? 'Disponible' : (p.stock > 0 ? 'Stock Bajo' : 'Agotado');
-            // Mock de imagen e icono según si existe
             const imgHtml = p.imagen ? `<img src="${p.imagen.startsWith('http') || p.imagen.startsWith('data:') ? p.imagen : '../' + p.imagen}" style="width:30px; height:30px; object-fit:cover; border-radius:4px; margin-right:10px;">` : `<span class="product-icon product-icon--tool">🔧</span>`;
 
             return `
@@ -306,7 +409,6 @@
         }).join('');
 
         renderPaginationUI(totalItems, page, ITEMS_PER_PAGE, '.table-pagination', 'inventario');
-
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
@@ -327,13 +429,53 @@
         if (!tbody || !window.Store) return;
 
         window.adminOrders = await window.Store.getOrders();
-        const orders = window.adminOrders;
+
+        const s = document.getElementById('searchPedidos');
+        const fE = document.getElementById('filterEstado');
+        const fT = document.getElementById('filterEntrega');
+
+        if (s && !s.dataset.bound) {
+            s.addEventListener('input', () => { window.dashboardPagination.pedidos = 1; updatePedidosTable(); });
+            fE.addEventListener('change', () => { window.dashboardPagination.pedidos = 1; updatePedidosTable(); });
+            fT.addEventListener('change', () => { window.dashboardPagination.pedidos = 1; updatePedidosTable(); });
+            s.dataset.bound = 'true';
+        }
+
+        updatePedidosTable();
+    }
+
+    function updatePedidosTable() {
+        const tbody = document.getElementById('adminOrdersTableBody');
+        if (!tbody) return;
+
+        let orders = window.adminOrders || [];
+
+        // Apply filters
+        const s = document.getElementById('searchPedidos')?.value.toLowerCase();
+        const fE = document.getElementById('filterEstado')?.value;
+        const fT = document.getElementById('filterEntrega')?.value;
+
+        if (s || fE || fT) {
+            const statusMap = { 'pendiente': 'pending', 'procesando': 'processing', 'completado': 'completed', 'cancelado': 'cancelled' };
+            orders = orders.filter(o => {
+                let match = true;
+                if (s) {
+                    let cName = o.userId ? (window.Store.getUserById(o.userId)?.nombre || 'Cliente') : 'Cliente';
+                    if (!o.id.toString().includes(s) && !cName.toLowerCase().includes(s)) match = false;
+                }
+                if (fE && o.status !== statusMap[fE]) match = false;
+                if (fT && o.type !== fT) match = false;
+                return match;
+            });
+        }
         
-        // Actualizar mini-stats
-        const pPendientes = orders.filter(o => o.status === 'pendiente').length;
-        const pProceso = orders.filter(o => o.status === 'procesando').length;
-        const pCompletados = orders.filter(o => o.status === 'completado').length;
-        const pRecogida = orders.filter(o => o.type === 'recogida' && o.status !== 'completado').length;
+        // Actualizar mini-stats basados en data original (o filtrada, usualmente original)
+        // Lo mantendremos utilizando window.adminOrders para reflejar el total real siempre.
+        const allOrders = window.adminOrders;
+        const pPendientes = allOrders.filter(o => o.status === 'pending').length;
+        const pProceso = allOrders.filter(o => o.status === 'processing').length;
+        const pCompletados = allOrders.filter(o => o.status === 'completed').length;
+        const pRecogida = allOrders.filter(o => o.type === 'recogida' && o.status !== 'completed').length;
 
         if (document.getElementById('pedidosPendientes')) document.getElementById('pedidosPendientes').textContent = pPendientes;
         if (document.getElementById('pedidosProceso')) document.getElementById('pedidosProceso').textContent = pProceso;
@@ -341,7 +483,7 @@
         if (document.getElementById('pedidosRecogida')) document.getElementById('pedidosRecogida').textContent = pRecogida;
 
         if (orders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay órdenes registradas.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay órdenes que coincidan con los filtros.</td></tr>';
             renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'pedidos');
             return;
         }
@@ -356,7 +498,6 @@
         let rows = '';
         paginatedOrders.forEach(order => {
             const date = new Date(order.fecha).toLocaleDateString();
-            
             let clienteName = "Cliente";
             if (order.userId) {
                 const user = window.Store.getUserById(order.userId);
@@ -365,16 +506,16 @@
             
             let badgeClass = 'warning';
             let estadoLabel = 'Pendiente';
-            if (order.status === 'completado') { badgeClass = 'success'; estadoLabel = 'Completado'; }
-            else if (order.status === 'cancelado') { badgeClass = 'danger'; estadoLabel = 'Cancelado'; }
-            else if (order.status === 'procesando') { badgeClass = 'info'; estadoLabel = 'En Proceso'; }
+            if (order.status === 'completed') { badgeClass = 'success'; estadoLabel = 'Completado'; }
+            else if (order.status === 'cancelled') { badgeClass = 'danger'; estadoLabel = 'Cancelado'; }
+            else if (order.status === 'processing') { badgeClass = 'info'; estadoLabel = 'En Proceso'; }
 
-            const deliveryIcon = order.tipoEntrega === 'envio' ? '<i data-lucide="truck"></i> Envío' : '<i data-lucide="store"></i> Recogida';
-            const deliveryClass = order.tipoEntrega === 'envio' ? 'shipping' : 'pickup';
+            const deliveryIcon = order.type === 'envio' ? '<i data-lucide="truck"></i> Envío' : '<i data-lucide="store"></i> Recogida';
+            const deliveryClass = order.type === 'envio' ? 'shipping' : 'pickup';
 
             rows += `
                 <tr>
-                    <td><strong>${order.id}</strong></td>
+                    <td><strong>${(order.id || '').substring(0,8)}</strong></td>
                     <td>${clienteName}</td>
                     <td>${date}</td>
                     <td>$${parseFloat(order.total || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</td>
@@ -404,20 +545,79 @@
         const { data: profiles, error } = await window.supabase.from('profiles').select('*');
         if (error) return;
 
-        const clientes = profiles.filter(u => u.role !== 'admin');
+        window.adminProfiles = profiles.filter(u => u.role !== 'admin');
+        window.adminOrders = await window.Store.getOrders() || [];
 
-        // Actualizar mini-stats
-        if (document.getElementById('clientesTotal')) document.getElementById('clientesTotal').textContent = clientes.length;
-        if (document.getElementById('clientesNuevos')) document.getElementById('clientesNuevos').textContent = clientes.length; // Simulado
-        if (document.getElementById('clientesRecurrentes')) document.getElementById('clientesRecurrentes').textContent = '0%'; // Simulado
+        const s = document.getElementById('searchClientes');
+        const fA = document.getElementById('filterClienteEstado');
+
+        if (s && !s.dataset.bound) {
+            s.addEventListener('input', () => { window.dashboardPagination.clientes = 1; updateClientesTable(); });
+            fA.addEventListener('change', () => { window.dashboardPagination.clientes = 1; updateClientesTable(); });
+            s.dataset.bound = 'true';
+        }
+
+        updateClientesTable();
+    }
+
+    function updateClientesTable() {
+        const tbody = document.getElementById('adminClientesTableBody');
+        if (!tbody) return;
+
+        let clientes = window.adminProfiles || [];
+        const orders = window.adminOrders || [];
+
+        // Calcular mini-stats globales (siempre sobre el universo de clientes real)
+        let nuevosEsteMes = 0;
+        const ahora = new Date();
+        const startOfMonth = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+        let clientesConRepeticion = 0;
+
+        window.adminProfiles.forEach(c => {
+            if (c.created_at) {
+                if (new Date(c.created_at) >= startOfMonth) nuevosEsteMes++;
+            } else { nuevosEsteMes++; }
+            const repeticiones = orders.filter(o => o.userId === c.id).length;
+            if (repeticiones > 1) clientesConRepeticion++;
+        });
+
+        const pctRecurrentes = window.adminProfiles.length > 0 ? Math.round((clientesConRepeticion / window.adminProfiles.length) * 100) : 0;
+
+        if (document.getElementById('clientesTotal')) document.getElementById('clientesTotal').textContent = window.adminProfiles.length;
+        if (document.getElementById('clientesNuevos')) document.getElementById('clientesNuevos').textContent = nuevosEsteMes;
+        if (document.getElementById('clientesRecurrentes')) document.getElementById('clientesRecurrentes').textContent = pctRecurrentes + '%';
+
+        // Filters
+        const s = document.getElementById('searchClientes')?.value.toLowerCase();
+        const fA = document.getElementById('filterClienteEstado')?.value;
+
+        if (s || fA) {
+            clientes = clientes.filter(c => {
+                let match = true;
+                if (s && !c.full_name?.toLowerCase().includes(s) && !c.email?.toLowerCase().includes(s)) match = false;
+                
+                // Determinador de estado para filtros
+                let cEstado = 'activo';
+                // Si no hay orders y el perfil fue creado hace más de 3 meses, asumiremos inactivo.
+                // Usaremos esto para que el select pueda discriminar.
+                const userO = orders.filter(o => o.userId === c.id);
+                if (userO.length === 0 && c.created_at) {
+                    const cDate = new Date(c.created_at);
+                    const tresMesesAtras = new Date(ahora.setMonth(ahora.getMonth() - 3));
+                    if (cDate < tresMesesAtras) cEstado = 'inactivo';
+                }
+                
+                if (fA && fA !== '' && cEstado !== fA) match = false;
+
+                return match;
+            });
+        }
 
         if (clientes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay clientes registrados.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No hay clientes que coincidan con los filtros.</td></tr>';
             renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'clientes');
             return;
         }
-
-        const orders = await window.Store.getOrders() || [];
 
         const page = window.dashboardPagination.clientes;
         const totalItems = clientes.length;
@@ -426,17 +626,24 @@
 
         let rows = '';
         paginatedClientes.forEach(c => {
-            // Filtrar órdenes de este cliente
             const userOrders = orders.filter(o => o.userId === c.id);
-            const totalGasto = userOrders.filter(o => o.status === 'completado').reduce((sum, o) => sum + o.total, 0);
+            const totalGasto = userOrders.filter(o => o.status === 'completed').reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
             const numOrders = userOrders.length;
             
-            // Última compra
             let ultimaCompra = '-';
             if (numOrders > 0) {
                 const dates = userOrders.map(o => new Date(o.fecha).getTime());
                 const lastDate = new Date(Math.max(...dates));
                 ultimaCompra = lastDate.toLocaleDateString();
+            }
+
+            let eClass = 'success';
+            let eLabel = 'Activo';
+            if (numOrders === 0 && c.created_at) {
+                const cDate = new Date(c.created_at);
+                const limit = new Date();
+                limit.setMonth(limit.getMonth() - 3);
+                if (cDate < limit) { eClass = 'secondary'; eLabel = 'Inactivo'; }
             }
 
             const initial = c.full_name ? c.full_name.charAt(0).toUpperCase() : 'C';
@@ -451,7 +658,7 @@
                     <td><strong>${numOrders}</strong> pedidos</td>
                     <td><strong>$${parseFloat(totalGasto || 0).toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong></td>
                     <td>${ultimaCompra}</td>
-                    <td><span class="badge badge--success">Activo</span></td>
+                    <td><span class="badge badge--${eClass}">${eLabel}</span></td>
                 </tr>
             `;
         });
@@ -465,28 +672,70 @@
         if (!tbody || !window.Store) return;
 
         window.adminOrders = await window.Store.getOrders();
-        const allOrders = window.adminOrders;
-        const sales = allOrders.filter(o => o.status === 'completado');
 
-        // Calcular totales temporales (Hoy, Semana, Mes)
+        const sv = document.getElementById('searchVentas');
+        const fd = document.getElementById('filterFechaDesde');
+        const fh = document.getElementById('filterFechaHasta');
+
+        if (sv && !sv.dataset.bound) {
+            sv.addEventListener('input', () => { window.dashboardPagination.ventas = 1; updateVentasTable(); });
+            fd.addEventListener('change', () => { window.dashboardPagination.ventas = 1; updateVentasTable(); });
+            fh.addEventListener('change', () => { window.dashboardPagination.ventas = 1; updateVentasTable(); });
+            sv.dataset.bound = 'true';
+        }
+
+        // Calcular totales temporales generales aquí (se pueden dejar los del updateVentasTable pero la gráfica solo se carga 1 vez por vista)
+        const pureSales = allOrders.filter(o => o.status === 'completed');
+        renderVentasCharts(pureSales);
+
+        updateVentasTable();
+    }
+
+    function updateVentasTable() {
+        const tbody = document.getElementById('adminVentasTableBody');
+        if (!tbody) return;
+
+        const allOrders = window.adminOrders || [];
+        // Sales solo considera completadas
+        let sales = allOrders.filter(o => o.status === 'completed');
+
+        // Apply filters
+        const sv = document.getElementById('searchVentas')?.value.toLowerCase();
+        const fd = document.getElementById('filterFechaDesde')?.value;
+        const fh = document.getElementById('filterFechaHasta')?.value;
+
+        if (sv || fd || fh) {
+            sales = sales.filter(o => {
+                let match = true;
+                if (sv) {
+                    let cName = o.userId ? (window.Store.getUserById(o.userId)?.nombre || 'Cliente') : 'Cliente';
+                    if (!o.id.toString().includes(sv) && !cName.toLowerCase().includes(sv)) match = false;
+                }
+                if (fd && new Date(o.fecha) < new Date(fd)) match = false;
+                if (fh && new Date(o.fecha) > new Date(fh)) match = false;
+                return match;
+            });
+        }
+
+        // Totales sobre todas las sales (ignorando filtro específico de tabla visual para que stats coincidan, o usar sales filtrado. Usaremos histórico integral para stats)
+        const pureSales = allOrders.filter(o => o.status === 'completed');
         const now = new Date();
         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay()); // Inicio de semana (Domingo)
+        startOfWeek.setDate(now.getDate() - now.getDay());
         startOfWeek.setHours(0,0,0,0);
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        const totalHoy = sales.filter(o => new Date(o.fecha) >= startOfDay).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
-        const totalSemana = sales.filter(o => new Date(o.fecha) >= startOfWeek).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
-        const totalMes = sales.filter(o => new Date(o.fecha) >= startOfMonth).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const totalHoy = pureSales.filter(o => new Date(o.fecha) >= startOfDay).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const totalSemana = pureSales.filter(o => new Date(o.fecha) >= startOfWeek).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
+        const totalMes = pureSales.filter(o => new Date(o.fecha) >= startOfMonth).reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
 
-        // Inyectar en UI
         if (document.getElementById('ventasHoy')) document.getElementById('ventasHoy').textContent = '$' + totalHoy.toLocaleString('es-DO', {minimumFractionDigits: 2});
         if (document.getElementById('ventasSemana')) document.getElementById('ventasSemana').textContent = '$' + totalSemana.toLocaleString('es-DO', {minimumFractionDigits: 2});
         if (document.getElementById('ventasMes')) document.getElementById('ventasMes').textContent = '$' + totalMes.toLocaleString('es-DO', {minimumFractionDigits: 2});
 
         if (sales.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No hay ventas registradas.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">No hay ventas que coincidan con los filtros.</td></tr>';
             renderPaginationUI(0, 1, ITEMS_PER_PAGE, '.table-pagination', 'ventas');
             return;
         }
@@ -510,7 +759,7 @@
 
             rows += `
                 <tr>
-                    <td><strong>${order.id}</strong></td>
+                    <td><strong>${(order.id || '').substring(0,8)}</strong></td>
                     <td>${clienteName}</td>
                     <td>${itemCount} artículos</td>
                     <td>${date}</td>
@@ -844,6 +1093,8 @@
         const ctxCategorias = document.getElementById('categoriasDonutChart');
 
         if (ctxSemana && typeof Chart !== 'undefined') {
+            if (window.ventasSemanaChartInstance) window.ventasSemanaChartInstance.destroy();
+
             const last7Days = [...Array(7)].map((_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - (6 - i));
@@ -856,11 +1107,11 @@
                 d.setDate(d.getDate() - (6 - i));
                 const dStr = d.toLocaleDateString();
                 return orders
-                    .filter(o => o.estado === 'completado' && new Date(o.fecha).toLocaleDateString() === dStr)
+                    .filter(o => o.status === 'completed' && new Date(o.fecha).toLocaleDateString() === dStr)
                     .reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
             });
 
-            new Chart(ctxSemana, {
+            window.ventasSemanaChartInstance = new Chart(ctxSemana, {
                 type: 'bar',
                 data: {
                     labels: last7Days,
@@ -881,13 +1132,15 @@
         }
 
         if (ctxCategorias && typeof Chart !== 'undefined') {
+            if (window.categoriasDonutChartInstance) window.categoriasDonutChartInstance.destroy();
+
             const counts = {};
             products.forEach(p => {
                 const cat = p.categoria || 'Sin Categoría';
                 counts[cat] = (counts[cat] || 0) + 1;
             });
 
-            new Chart(ctxCategorias, {
+            window.categoriasDonutChartInstance = new Chart(ctxCategorias, {
                 type: 'doughnut',
                 data: {
                     labels: Object.keys(counts),
@@ -908,6 +1161,8 @@
     function renderVentasCharts(sales) {
         const ctxTendencia = document.getElementById('tendenciaVentasChart');
         if (ctxTendencia && typeof Chart !== 'undefined') {
+            if (window.tendenciaVentasChartInstance) window.tendenciaVentasChartInstance.destroy();
+
             const days = [...Array(15)].map((_, i) => {
                 const d = new Date();
                 d.setDate(d.getDate() - (14 - i));
@@ -923,7 +1178,7 @@
                     .reduce((sum, o) => sum + parseFloat(o.total || 0), 0);
             });
 
-            new Chart(ctxTendencia, {
+            window.tendenciaVentasChartInstance = new Chart(ctxTendencia, {
                 type: 'line',
                 data: {
                     labels: days,

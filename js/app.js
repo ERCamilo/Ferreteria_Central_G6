@@ -1,14 +1,22 @@
 /**
- * App.js — Lógica de la tienda principal
- * Ferretería Central - Grupo 6
- * 
- * Renderiza dinámicamente los productos y maneja el carrito (estilo Uber-Eats)
+ * App.js - Logica de la tienda principal
+ * Ferreteria Central - Grupo 6
+ *
+ * Renderiza dinamicamente los productos y maneja el carrito.
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-
     const productGrid = document.getElementById("productGrid");
     const cartCountHeader = document.querySelector(".cart-count");
+    const productsCountText = document.querySelector(".products-count");
+    const searchInput = document.getElementById("searchInput");
+    const searchCategory = document.getElementById("searchCategory");
+    const searchBtn = document.getElementById("searchBtn");
+
+    let allProducts = [];
+    let activeSearchTerm = "";
+    let activeCategory = "";
+    let productsLoaded = false;
 
     // ===========================
     // UI UPDATES
@@ -20,56 +28,120 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function updateProductsCount(total) {
+        if (productsCountText) {
+            productsCountText.innerHTML = `Mostrando <strong>${total}</strong> productos`;
+        }
+    }
+
+    function normalizeText(value) {
+        return (value || "")
+            .toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toLowerCase();
+    }
+
+    function escapeAttribute(value) {
+        return (value || "")
+            .toString()
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+    function matchesCategory(product, selectedCategory) {
+        if (!selectedCategory) return true;
+
+        const normalizedCategory = normalizeText(product.categoria);
+        const categoryAliases = {
+            herramientas: ["herramienta", "manual", "medicion", "precision", "corte"],
+            materiales: ["material", "construccion", "cemento", "agregado", "madera"],
+            equipos: ["equipo", "almacenamiento", "seguridad", "jardin"],
+            electricidad: ["electricidad", "electrica", "electricas", "iluminacion"],
+            plomeria: ["plomeria", "tuberia", "bano", "griferia"],
+            pintura: ["pintura", "acabado", "sellador"]
+        };
+
+        const aliases = categoryAliases[selectedCategory] || [selectedCategory];
+        return aliases.some(alias => normalizedCategory.includes(alias));
+    }
+
+    function getFilteredProducts(products) {
+        const normalizedTerm = normalizeText(activeSearchTerm);
+
+        return products.filter(product => {
+            const matchesSearch = !normalizedTerm || [
+                product.nombre,
+                product.descripcion,
+                product.categoria
+            ].some(field => normalizeText(field).includes(normalizedTerm));
+
+            return matchesSearch && matchesCategory(product, activeCategory);
+        });
+    }
+
     // ===========================
     // RENDERIZADO DE PRODUCTOS
     // ===========================
+
+    async function loadProducts() {
+        if (!productsLoaded) {
+            allProducts = await Store.getProducts();
+            productsLoaded = true;
+        }
+    }
 
     async function renderProducts() {
         if (!productGrid) return;
 
         // Mostrar loader inicial si el grid está vacío
-        if (productGrid.innerHTML === '') {
+        if (productGrid.innerHTML.trim() === '' || productGrid.innerHTML.includes('Productos cargados dinámicamente')) {
             productGrid.innerHTML = '<div class="loader-container"><i data-lucide="loader" class="spin"></i> Cargando productos...</div>';
-            lucide.createIcons();
+            if (typeof lucide !== "undefined") {
+                lucide.createIcons();
+            }
         }
 
-        const products = await Store.getProducts();
+        await loadProducts();
         const cart = Store.getCart();
+        const products = getFilteredProducts(allProducts);
 
-        let html = '';
-        // ... (resto de la lógica igual, pero con los datos de Supabase)
+        if (products.length === 0) {
+            productGrid.innerHTML = '<p class="no-products-message">No se encontraron productos</p>';
+            updateProductsCount(0);
+            return;
+        }
+
+        let html = "";
 
         products.forEach(product => {
-            // Check if product is in cart
             const cartItem = cart.find(item => item.productId === product.id);
             const inCart = !!cartItem;
             const qty = inCart ? cartItem.cantidad : 0;
 
-            // Etiqueta de clase css según categoría para el color
-            let badgeClass = 'badge--manual';
-            if (product.categoria.includes('Eléctricas')) badgeClass = 'badge--electric';
-            if (product.categoria.includes('Almacenamiento')) badgeClass = 'badge--storage';
-            if (product.categoria.includes('Medición')) badgeClass = 'badge--measure';
+            let badgeClass = "badge--manual";
+            if (product.categoria.includes("Eléctricas")) badgeClass = "badge--electric";
+            if (product.categoria.includes("Almacenamiento")) badgeClass = "badge--storage";
+            if (product.categoria.includes("Medición")) badgeClass = "badge--measure";
 
-
-            let actionHtml = '';
+            let actionHtml = "";
 
             if (!inCart) {
-                // Estado 1: No está en el carrito
                 actionHtml = `
                     <button class="add-cart-btn block-btn" onclick="appHandleAddToCart('${product.id}')">
                         <i data-lucide="shopping-cart"></i> Agregar
                     </button>
                 `;
             } else {
-                // Estado 2: Está en el carrito (controles de cantidad)
-                // Si la cantidad es 0, el botón de resta se convierte en un basurero rojo
-                const minusIcon = qty === 0 ? '<i data-lucide="trash-2" class="text-red"></i>' : '−';
+                const minusIcon = qty === 0 ? '<i data-lucide="trash-2" class="text-red"></i>' : "−";
                 const minusAction = qty === 0 ? `appHandleRemove('${product.id}')` : `appHandleUpdateQty('${product.id}', -1)`;
 
                 actionHtml = `
                     <div class="uber-qty-controls">
-                        <button class="qty-btn ${qty === 0 ? 'qty-trash' : ''}" onclick="${minusAction}">
+                        <button class="qty-btn ${qty === 0 ? "qty-trash" : ""}" onclick="${minusAction}">
                             ${minusIcon}
                         </button>
                         <span class="qty-display">${qty}</span>
@@ -79,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             html += `
-                <article class="store-card" data-product-id="${product.id}">
+                <article class="store-card" data-product-id="${product.id}" data-name="${escapeAttribute(product.nombre)}" data-category="${escapeAttribute(product.categoria)}">
                     <div class="store-card__image">
                         <span class="category-badge ${badgeClass}">${product.categoria}</span>
                         <img src="${product.imagen}" alt="${product.nombre}" loading="lazy">
@@ -102,9 +174,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         productGrid.innerHTML = html;
+        updateProductsCount(products.length);
 
         // Re-inicializar iconos
-        if (typeof lucide !== 'undefined') {
+        if (typeof lucide !== "undefined") {
             lucide.createIcons();
         }
 
@@ -112,22 +185,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ===========================
-    // ACCIONES GLOBALES (Window Exp)
+    // ACCIONES GLOBALES
     // ===========================
 
     window.appHandleAddToCart = function (productId) {
         Store.addToCart(productId, 1);
-        renderProducts(); // Re-render para mostrar los controles Uber-Eats
+        renderProducts();
     };
 
     window.appHandleUpdateQty = function (productId, delta) {
         const cart = Store.getCart();
         const item = cart.find(i => i.productId === productId);
+
         if (item) {
             const newQty = item.cantidad + delta;
-            // No eliminamos si baja a 0, solo actualizamos (Store ya permite 0)
             Store.updateCartQty(productId, newQty);
         }
+
         renderProducts();
     };
 
@@ -136,7 +210,23 @@ document.addEventListener("DOMContentLoaded", function () {
         renderProducts();
     };
 
-    // Inicializar la vista
-    renderProducts();
+    function applyFilters() {
+        activeSearchTerm = searchInput ? searchInput.value : "";
+        activeCategory = searchCategory ? searchCategory.value : "";
+        renderProducts();
+    }
 
+    if (searchInput) {
+        searchInput.addEventListener("input", applyFilters);
+    }
+
+    if (searchCategory) {
+        searchCategory.addEventListener("change", applyFilters);
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener("click", applyFilters);
+    }
+
+    renderProducts();
 });
