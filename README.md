@@ -23,12 +23,11 @@
 
 | # | Nombre | Matrícula |
 |---|--------|-----------|
-| 1 | Leilany Morán | 100074062 |
-| 2 | Erlin Camilo | 100018052 |
-| 3 | Wens Ribaldy | 100049492 |
-| 4 | Santa González | 100031546 |
-| 5 | Franyerli Reyes | 100020937 |
-| 6 | Jhovanny Rosado | 100069725 |
+| 1 | Erlin Camilo | 100018052 |
+| 2 | Leilany Morán | 100074062 |
+| 3 | Santa González | 100031546 |
+| 4 | Franyerli Reyes | 100020937 |
+
 
 ---
 
