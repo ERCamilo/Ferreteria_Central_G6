@@ -58,8 +58,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 <!-- Account -->
                 <a href="${basePath}login.html" class="header-account" id="headerAccount">
-                    <small>Hola, Identifícate</small>
-                    <strong>Cuenta <i data-lucide="chevron-down"></i></strong>
+                    <i data-lucide="user"></i>
+                    <div class="header-account-info">
+                        <small>Hola, Identifícate</small>
+                        <strong>Cuenta <i data-lucide="chevron-down"></i></strong>
+                    </div>
                 </a>
 
                 <!-- Orders -->
@@ -115,7 +118,13 @@ document.addEventListener("DOMContentLoaded", function() {
             const accountLink = document.getElementById('headerAccount');
             if (session && accountLink) {
                 const displayName = (session.full_name || session.email || 'Usuario').split(' ')[0];
-                accountLink.innerHTML = '<small>Hola, ' + displayName + '</small><strong>Mi Cuenta <i data-lucide="chevron-down"></i></strong>';
+                accountLink.innerHTML = `
+                    <i data-lucide="user"></i>
+                    <div class="header-account-info">
+                        <small>Hola, ${displayName}</small>
+                        <strong>Mi Cuenta <i data-lucide="chevron-down"></i></strong>
+                    </div>
+                `;
                 accountLink.href = `${basePath}views/perfil.html`;
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             }

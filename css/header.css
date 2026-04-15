@@ -165,6 +165,9 @@
   flex-shrink: 0;
   transition: var(--transition);
   line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .header-account:hover,
@@ -183,13 +186,21 @@
   font-size: 13px;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
 }
 
 .header-account i,
-.header-account svg {
-  width: 12px;
-  height: 12px;
+.header-account svg,
+.header-orders i,
+.header-orders svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Ocultamos el icono por defecto en desktop */
+.header-account > i,
+.header-account > svg {
+  display: none;
 }
 
 .header-cart {
@@ -318,21 +329,75 @@
   .header-inner {
     flex-wrap: wrap;
     justify-content: space-between;
+    gap: 8px;
   }
 
-  .header-search {
-    order: 3;
-    width: 100%;
-    margin-top: 10px;
+  /* Ocultar elementos secundarios para salvar espacio */
+  .header-deliver,
+  .header-orders {
+    display: none;
+  }
+
+  .header-logo {
+    padding: 0;
+  }
+
+  .header-logo-img {
+    width: 50px; /* Logo más pequeño en móvil */
   }
 
   .header-logo-text {
-    display: none; /* Hide large logo text on tiny devices to save space */
+    display: none;
   }
 
+  /* Botón de cuenta compacto en móvil */
+  .header-account {
+    padding: 6px;
+  }
+
+  .header-account > i,
+  .header-account > svg {
+    display: block; /* Mostrar icono en móvil */
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-account-info {
+    display: none; /* Ocultar texto largo en móvil para priorizar icono */
+  }
+
+  /* Buscador en fila independiente y full-width */
+  .header-search {
+    order: 3;
+    width: 100%;
+    margin-top: 5px;
+    height: 44px; /* Un poco más alto para mejor toque */
+  }
+
+  .search-category {
+    display: none; /* Ocultar selector de categorías en móvil para simplificar */
+  }
+
+  .header-cart i,
+  .header-cart svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-cart strong {
+    display: none; /* Ocultar texto "Carrito" */
+  }
+
+  .cart-count {
+    left: 18px;
+    top: -4px;
+  }
+
+  /* Navegación */
   .nav-inner {
-    flex-wrap: wrap;
-    gap: 8px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 0 10px;
   }
 
   .nav-promo {
@@ -340,7 +405,11 @@
   }
 
   .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 0;
+  }
+
+  .nav-link {
+    font-size: 12px;
+    padding: 10px 12px;
   }
 }
